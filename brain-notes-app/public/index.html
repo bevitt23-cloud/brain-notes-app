@@ -291,14 +291,14 @@ textarea::placeholder{color:var(--muted);}
       <button class="file-remove" onclick="clearFile()">✕</button>
     </div>
     <div class="divider-or">OR</div>
-    <textarea id="paste-input" placeholder="Paste your text here..."></textarea>
-    <div class="divider-or">OR</div>
     <div class="section-label" style="margin-bottom:8px;">🔗 Paste a URL</div>
     <div class="url-input-wrap">
       <input class="url-input" type="url" id="url-input" placeholder="https://example.com/article..." />
       <button class="url-fetch-btn" id="url-fetch-btn" onclick="fetchURL()">Fetch</button>
     </div>
     <div class="url-ok hidden" id="url-ok">✅ <span id="url-ok-msg"></span></div>
+    <div class="divider-or">OR</div>
+    <textarea id="paste-input" placeholder="Paste your text here..."></textarea>
     <div class="err-box hidden" id="gen-err"></div>
     <button class="gen-btn" id="gen-btn" onclick="generateNotes()">✨ Turn Into Brain-Friendly Notes</button>
   </div>
