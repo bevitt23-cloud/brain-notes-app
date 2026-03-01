@@ -280,10 +280,10 @@ textarea::placeholder{color:var(--muted);}
   <div class="upload-section" id="upload-section">
     <div class="section-label">📂 Step 1 -- Add Your Content</div>
     <div class="drop-zone" id="drop-zone">
-      <input type="file" id="file-input" accept=".pdf,.docx,.txt" />
+      <input type="file" id="file-input" accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.gif" />
       <div class="drop-icon">📄</div>
       <div class="drop-text">Drop a file here, or click to browse</div>
-      <div class="drop-sub">Supports: PDF, Word (.docx), or .txt files</div>
+      <div class="drop-sub">Supports: PDF, Word (.docx), .txt, or image files (JPG, PNG)</div>
       <div class="drop-tip">💡 Tip: If your PDF is very long, paste one section of text instead</div>
     </div>
     <div class="file-preview hidden" id="file-preview">
@@ -291,12 +291,11 @@ textarea::placeholder{color:var(--muted);}
       <button class="file-remove" onclick="clearFile()">✕</button>
     </div>
     <div class="divider-or">OR</div>
-    <div class="section-label" style="margin-bottom:8px;">🔗 Paste a URL</div>
+    <div class="section-label" style="margin-bottom:8px;">🔗 Paste a Website URL</div>
     <div class="url-input-wrap">
       <input class="url-input" type="url" id="url-input" placeholder="https://example.com/article..." />
-      <button class="url-fetch-btn" id="url-fetch-btn" onclick="fetchURL()">Fetch</button>
     </div>
-    <div class="url-ok hidden" id="url-ok">✅ <span id="url-ok-msg"></span></div>
+    <div class="drop-tip" style="margin-top:6px;">💡 Paste a URL and hit the button below -- we'll grab the text automatically!</div>
     <div class="divider-or">OR</div>
     <textarea id="paste-input" placeholder="Paste your text here..."></textarea>
     <div class="err-box hidden" id="gen-err"></div>
@@ -306,7 +305,7 @@ textarea::placeholder{color:var(--muted);}
   <div class="loading-box hidden" id="loading-box">
     <div class="spinner"></div>
     <div class="loading-text">Making your notes...</div>
-    <div class="loading-sub">Reading your content and building something easier for your brain 🧠</div>
+    <div class="loading-sub">Fetching content and building something easier for your brain 🧠</div>
   </div>
 
   <div class="output-section hidden" id="output-section">
@@ -634,44 +633,7 @@ function toggleDark() {
 }
 
 
-// ══════════════════════════════════════════════
-//  FETCH URL
-// ══════════════════════════════════════════════
-async function fetchURL() {
-  const url = document.getElementById('url-input').value.trim();
-  const btn = document.getElementById('url-fetch-btn');
-  const okEl = document.getElementById('url-ok');
-  const okMsg = document.getElementById('url-ok-msg');
-  hide('url-ok');
-  hide('gen-err');
-
-  if (!url) return showErr('gen-err', 'Please enter a URL first.');
-  if (!url.startsWith('http')) return showErr('gen-err', 'Please enter a full URL starting with https://');
-
-  btn.disabled = true;
-  btn.textContent = 'Fetching...';
-
-  try {
-    const resp = await fetch('/.netlify/functions/fetch-url', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url })
-    });
-    const data = await resp.json();
-    if (!resp.ok) throw new Error(data.error || 'Could not fetch that URL.');
-
-    // Put extracted text into the paste box
-    document.getElementById('paste-input').value = data.text;
-    clearFile();
-    okMsg.textContent = 'Page content loaded! Hit the button below to turn it into notes.';
-    show('url-ok');
-  } catch(e) {
-    showErr('gen-err', e.message);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Fetch';
-  }
-}
+// URL fetching is now handled inside extractText()
 
 // ══════════════════════════════════════════════
 //  FILE HANDLING
@@ -700,13 +662,39 @@ async function extractText() {
   if (selectedFile) {
     const ext = selectedFile.name.split('.').pop().toLowerCase();
     if (ext === 'txt')  return await selectedFile.text();
-    if (ext === 'docx') { const ab = await selectedFile.arrayBuffer(); return (await mammoth.extractRawText({arrayBuffer:ab})).value; }
-    if (ext === 'pdf')  return await readB64(selectedFile);
-    throw new Error('Unsupported file type. Please use PDF, .docx, or .txt');
+    if (ext === 'docx') {
+      const ab = await selectedFile.arrayBuffer();
+      const result = await mammoth.extractRawText({arrayBuffer: ab});
+      return { type: 'text', content: result.value };
+    }
+    if (ext === 'pdf') {
+      const b64 = await readB64(selectedFile);
+      return { type: 'pdf', content: b64 };
+    }
+    if (['jpg','jpeg','png','webp','gif'].includes(ext)) {
+      const b64 = await readB64(selectedFile);
+      const mimeMap = { jpg:'image/jpeg', jpeg:'image/jpeg', png:'image/png', webp:'image/webp', gif:'image/gif' };
+      return { type: 'image', content: b64.split(',')[1], mime: mimeMap[ext] || 'image/jpeg' };
+    }
+    throw new Error('Unsupported file type. Please use PDF, .docx, .txt, or an image file.');
+  }
+  // Check URL input
+  const urlVal = document.getElementById('url-input').value.trim();
+  if (urlVal) {
+    if (!urlVal.startsWith('http')) throw new Error('Please enter a full URL starting with https://');
+    const resp = await fetch('/.netlify/functions/fetch-url', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: urlVal })
+    });
+    let data;
+    try { data = await resp.json(); } catch(e) { throw new Error('Could not reach the URL fetcher. Please paste text instead.'); }
+    if (!resp.ok) throw new Error(data.error || 'Could not fetch that URL. Try pasting the text instead.');
+    return { type: 'url', content: data.text, images: data.images || [], sourceUrl: data.sourceUrl };
   }
   const p = document.getElementById('paste-input').value.trim();
-  if (p) return p;
-  throw new Error('Please upload a file or paste some text first.');
+  if (p) return { type: 'text', content: p };
+  throw new Error('Please upload a file, enter a URL, or paste some text first.');
 }
 
 function readB64(file) {
@@ -741,8 +729,8 @@ async function callClaude(payload) {
 // ══════════════════════════════════════════════
 async function generateNotes() {
   hide('gen-err');
-  let raw;
-  try { raw = await extractText(); } catch(e) { showErr('gen-err', e.message); return; }
+  let extracted;
+  try { extracted = await extractText(); } catch(e) { showErr('gen-err', e.message); return; }
 
   const btn = document.getElementById('gen-btn');
   btn.disabled = true;
@@ -751,14 +739,29 @@ async function generateNotes() {
   document.getElementById('upload-section').style.pointerEvents = 'none';
 
   try {
-    const isPDF = selectedFile?.name.toLowerCase().endsWith('.pdf');
     let messages;
-    if (isPDF) {
-      const b64 = raw.split(',')[1] || raw;
+    const basePrompt = 'Convert this study material into ADHD-friendly notes. If you find references to images, diagrams or charts, describe what they likely show based on context and include a visual description box:';
+
+    if (extracted.type === 'pdf') {
+      const b64 = extracted.content.split(',')[1] || extracted.content;
       if (b64.length < 100) throw new Error('Could not read PDF. Try pasting the text instead.');
-      messages = [{role:'user',content:[{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},{type:'text',text:'Convert this study material into ADHD-friendly notes:'}]}];
+      messages = [{role:'user',content:[{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},{type:'text',text:basePrompt}]}];
+    } else if (extracted.type === 'image') {
+      messages = [{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:extracted.mime,data:extracted.content}},
+        {type:'text',text:'This is a study image, diagram, or chart. Convert it into ADHD-friendly notes. Describe what the image shows in detail, including any labels, arrows, processes, or relationships shown. Include a visual description box in the notes.'}
+      ]}];
+    } else if (extracted.type === 'url' && extracted.images && extracted.images.length > 0) {
+      // Build content array with text + images from the page
+      const contentParts = [{type:'text',text:basePrompt + '\n\nPage text:\n' + extracted.content + '\n\nThis page also contains images. After your notes, include a section called "Visual References" that links back to each image and describes what it shows based on context. Use this format for each image: <div class="n-box blue"><div class="n-box-label">🖼 Visual Reference</div><p>[Description of what this image/diagram shows]</p><a href="IMAGE_URL" target="_blank" rel="noopener">View original image</a></div>'}];
+      // Add up to 3 images for Claude to actually see
+      for (let i = 0; i < Math.min(extracted.images.length, 3); i++) {
+        const img = extracted.images[i];
+        contentParts.push({type:'text',text:'Image ' + (i+1) + ' (alt: ' + img.alt + ', url: ' + img.src + '):'});
+      }
+      messages = [{role:'user',content:contentParts}];
     } else {
-      messages = [{role:'user',content:'Convert this study material into ADHD-friendly notes:\n\n' + raw}];
+      messages = [{role:'user',content:basePrompt + '\n\n' + (extracted.content || extracted)}];
     }
 
     let html = await callClaude({ model:'claude-sonnet-4-20250514', max_tokens:6000, system:SYSTEM_PROMPT, messages });
@@ -783,8 +786,15 @@ async function generateNotes() {
 }
 
 const SYSTEM_PROMPT = `You are an expert at converting study material into ADHD-friendly notes. Return ONLY valid HTML using these exact CSS classes -- no markdown, no explanations.
-RULES: Break into 3-7 short sections with emoji titles. Use .n-chunk for plain-English summaries. Use .n-box with colors: blue=facts, green=steps, yellow=write this down, pink=warnings, purple=vocab, orange=examples. Bold key words. Add .n-pause between sections. End with .n-vocab recap. Short sentences. One idea per line.
-STRUCTURE: <h1>Title</h1><p class="subtitle">subtitle</p> then sections: <div class="n-section"><div class="n-section-title"><span>emoji</span> Title <span class="n-badge">Big Idea</span></div><div class="n-chunk"><p>text with <strong>bold</strong> and <span class="n-highlight">highlight</span></p></div><div class="n-box blue"><div class="n-box-label">📘 Label</div>content</div><ul class="n-list"><li>item</li></ul></div><span class="n-pause">✅ Pause -- Got it? Move on when ready.</span> -- end with: <div class="n-section"><div class="n-section-title"><span>🔑</span> Key Terms</div><div class="n-vocab"><div class="n-vocab-item"><span class="n-vocab-term">Term</span> -- definition</div></div></div>
+RULES:
+- Break into 3-7 short sections with emoji titles.
+- Use .n-chunk for plain-English summaries. Short sentences. One idea per line.
+- Use .n-box with colors: blue=facts/definitions, green=steps/processes, yellow=write this down, pink=warnings/catches, purple=vocab, orange=examples.
+- Bold key words with <strong>. Use <span class="n-highlight"> for key terms.
+- Add .n-pause between every section.
+- End with a .n-vocab key terms recap.
+- IMAGES AND DIAGRAMS: When you see or detect a diagram, chart, image, or visual (from a PDF, image file, or URL), always add a pink visual description box describing what it shows in plain English. Use this format: <div class="n-box pink"><div class="n-box-label">🖼 Visual: What This Shows</div><p>Plain English description of the diagram/chart/image</p></div>. If you have a URL for the image, add a link: <a href="URL" target="_blank" rel="noopener" style="color:var(--accent);font-weight:700;">View original image</a>
+STRUCTURE: <h1>Title</h1><p class="subtitle">subtitle</p> then sections: <div class="n-section"><div class="n-section-title"><span>emoji</span> Title <span class="n-badge">Big Idea</span></div><div class="n-chunk"><p>text</p></div><div class="n-box blue"><div class="n-box-label">📘 Label</div>content</div><ul class="n-list"><li>item</li></ul></div><span class="n-pause">✅ Pause -- Got it? Move on when ready.</span> -- end with: <div class="n-section"><div class="n-section-title"><span>🔑</span> Key Terms</div><div class="n-vocab"><div class="n-vocab-item"><span class="n-vocab-term">Term</span> -- definition</div></div></div>
 Return ONLY the HTML.`;
 
 // ══════════════════════════════════════════════
