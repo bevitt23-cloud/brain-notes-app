@@ -10,6 +10,23 @@ exports.handler = async function(event) {
 
   try {
     const body = JSON.parse(event.body);
+    let finalBody = body;
+
+    // NEW LOGIC: If a URL is provided, read it first!
+    if (body.targetUrl) {
+      const scrapeResp = await fetch(`https://r.jina.ai/${body.targetUrl}`);
+      const scrapedText = await scrapeResp.text();
+      
+      // Update the message to Claude with the new text
+      finalBody = {
+        ...body,
+        messages: [{
+          role: 'user', 
+          content: 'Convert this study material into ADHD-friendly notes:\n\n' + scrapedText
+        }]
+      };
+      delete finalBody.targetUrl; // Clean up
+    }
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -18,7 +35,7 @@ exports.handler = async function(event) {
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(finalBody)
     });
 
     const data = await response.json();
