@@ -293,7 +293,8 @@ textarea::placeholder{color:var(--muted);}
     <div class="divider-or">OR</div>
     <div class="section-label" style="margin-bottom:8px;">🔗 Paste a Website URL</div>
     <div class="url-input-wrap">
-      <input class="url-input" type="url" id="url-input" placeholder="https://example.com/article..." />
+      <input class="url-input" type="url" id="url-input" placeholder="https://example.com/article..." oninput="onURLInput()" />
+      <button class="url-fetch-btn hidden" id="url-clear-btn" onclick="clearURL()" title="Clear URL" style="background:var(--bg2);color:var(--muted);border:2px solid var(--border);">✕</button>
     </div>
     <div class="drop-tip" style="margin-top:6px;">💡 Paste a URL and hit the button below -- we'll grab the text automatically!</div>
     <div class="divider-or">OR</div>
@@ -635,6 +636,18 @@ function toggleDark() {
 
 // URL fetching is now handled inside extractText()
 
+function onURLInput() {
+  const val = document.getElementById('url-input').value.trim();
+  document.getElementById('url-clear-btn').classList.toggle('hidden', !val);
+  // Clear paste box if user is typing a URL
+  if (val) document.getElementById('paste-input').value = '';
+}
+
+function clearURL() {
+  document.getElementById('url-input').value = '';
+  document.getElementById('url-clear-btn').classList.add('hidden');
+}
+
 // ══════════════════════════════════════════════
 //  FILE HANDLING
 // ══════════════════════════════════════════════
@@ -680,8 +693,7 @@ async function extractText() {
   }
   // Check URL input
   const urlVal = document.getElementById('url-input').value.trim();
-  if (urlVal) {
-    if (!urlVal.startsWith('http')) throw new Error('Please enter a full URL starting with https://');
+  if (urlVal && urlVal.startsWith('http')) {
     const resp = await fetch('/.netlify/functions/fetch-url', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
