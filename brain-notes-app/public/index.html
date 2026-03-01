@@ -643,16 +643,31 @@ function clearFile() {
 }
 
 async function extractText() {
+  // 1. Check for URL first
+  const urlVal = document.getElementById('url-input').value.trim();
+  if (urlVal) {
+    const scrapeResp = await fetch(`https://r.jina.ai/${urlVal}`);
+    if (!scrapeResp.ok) throw new Error('Could not read the website. Try copy-pasting the text instead.');
+    return await scrapeResp.text();
+  }
+
+  // 2. Check for File
   if (selectedFile) {
     const ext = selectedFile.name.split('.').pop().toLowerCase();
-    if (ext === 'txt')  return await selectedFile.text();
-    if (ext === 'docx') { const ab = await selectedFile.arrayBuffer(); return (await mammoth.extractRawText({arrayBuffer:ab})).value; }
-    if (ext === 'pdf')  return await readB64(selectedFile);
-    throw new Error('Unsupported file type. Please use PDF, .docx, or .txt');
+    if (ext === 'txt') return await selectedFile.text();
+    if (ext === 'docx') { 
+      const ab = await selectedFile.arrayBuffer(); 
+      return (await mammoth.extractRawText({arrayBuffer:ab})).value; 
+    }
+    if (ext === 'pdf') return await readB64(selectedFile);
+    throw new Error('Unsupported file type.');
   }
+
+  // 3. Check for Paste
   const p = document.getElementById('paste-input').value.trim();
   if (p) return p;
-  throw new Error('Please upload a file or paste some text first.');
+
+  throw new Error('Please add a link, upload a file, or paste text!');
 }
 
 function readB64(file) {
