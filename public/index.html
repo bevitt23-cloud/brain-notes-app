@@ -688,8 +688,9 @@ async function extractText() {
       body: JSON.stringify({ url: urlVal })
     });
     let data;
-    try { data = await resp.json(); } catch(e) { throw new Error('Could not reach the URL fetcher. Please paste text instead.'); }
-    if (!resp.ok) throw new Error(data.error || 'Could not fetch that URL. Try pasting the text instead.');
+    try { data = await resp.json(); } catch(e) { throw new Error('This website is blocking outside access to its content. Try copying and pasting the text directly instead.'); }
+    if (!resp.ok) throw new Error(data.error || 'This website is blocking outside access. Try copying and pasting the text instead.');
+    if (!data.text) throw new Error('Could not extract text from that page. Try copying and pasting the text instead.');
     return { type: 'url', content: data.text, images: data.images || [], sourceUrl: data.sourceUrl };
   }
   const p = document.getElementById('paste-input').value.trim();
@@ -734,6 +735,9 @@ async function generateNotes() {
 
   const btn = document.getElementById('gen-btn');
   btn.disabled = true;
+  const isURL = !!document.getElementById('url-input').value.trim();
+  document.querySelector('.loading-text').textContent = isURL ? 'Fetching page and making notes...' : 'Making your notes...';
+  document.querySelector('.loading-sub').textContent = isURL ? 'Grabbing the page content and building something easier for your brain 🧠' : 'Fetching content and building something easier for your brain 🧠';
   show('loading-box');
   document.getElementById('upload-section').style.opacity = '.5';
   document.getElementById('upload-section').style.pointerEvents = 'none';
