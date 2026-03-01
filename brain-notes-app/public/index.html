@@ -704,8 +704,12 @@ async function callClaude(payload) {
 // ══════════════════════════════════════════════
 async function generateNotes() {
   hide('gen-err');
-  let raw;
-  try { raw = await extractText(); } catch(e) { showErr('gen-err', e.message); return; }
+  const urlVal = document.getElementById('url-input')?.value.trim();
+  let raw = '';
+
+  if (!urlVal) {
+    try { raw = await extractText(); } catch(e) { showErr('gen-err', e.message); return; }
+  }
 
   const btn = document.getElementById('gen-btn');
   btn.disabled = true;
@@ -714,17 +718,33 @@ async function generateNotes() {
   document.getElementById('upload-section').style.pointerEvents = 'none';
 
   try {
-    const isPDF = selectedFile?.name.toLowerCase().endsWith('.pdf');
-    let messages;
-    if (isPDF) {
-      const b64 = raw.split(',')[1] || raw;
-      if (b64.length < 100) throw new Error('Could not read PDF. Try pasting the text instead.');
-      messages = [{role:'user',content:[{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},{type:'text',text:'Convert this study material into ADHD-friendly notes:'}]}];
+    let payload;
+    if (urlVal) {
+      payload = {
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 6000,
+        system: SYSTEM_PROMPT,
+        targetUrl: urlVal 
+      };
     } else {
-      messages = [{role:'user',content:'Convert this study material into ADHD-friendly notes:\n\n' + raw}];
+      const isPDF = selectedFile?.name.toLowerCase().endsWith('.pdf');
+      let messages;
+      if (isPDF) {
+        const b64 = raw.split(',')[1] || raw;
+        if (b64.length < 100) throw new Error('Could not read PDF.');
+        messages = [{role:'user',content:[{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},{type:'text',text:'Convert this study material into ADHD-friendly notes:'}]}];
+      } else {
+        messages = [{role:'user',content:'Convert this study material into ADHD-friendly notes:\n\n' + raw}];
+      }
+      payload = {
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 6000,
+        system: SYSTEM_PROMPT,
+        messages: messages
+      };
     }
 
-    let html = await callClaude({ model:'claude-sonnet-4-20250514', max_tokens:6000, system:SYSTEM_PROMPT, messages });
+    let html = await callClaude(payload);
     const fence = html.match(/```(?:html)?\s*([\s\S]*?)```/i);
     if (fence) html = fence[1].trim();
     if (!html.includes('<')) html = `<h1>📋 Your Notes</h1><div class="n-section"><div class="n-chunk"><p>${html.replace(/\n/g,'<br>')}</p></div></div>`;
@@ -743,6 +763,7 @@ async function generateNotes() {
     btn.disabled = false;
     hide('loading-box');
   }
+}
 }
 
 const SYSTEM_PROMPT = `You are an expert at converting study material into ADHD-friendly notes. Return ONLY valid HTML using these exact CSS classes — no markdown, no explanations.
