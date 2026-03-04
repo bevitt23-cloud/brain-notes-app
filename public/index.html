@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
@@ -713,9 +713,23 @@ async function extractText() {
     }
     throw new Error('Unsupported file type. Please use PDF, .docx, .txt, or an image file.');
   }
+  // Check URL input
+  const urlVal = document.getElementById('url-input') ? document.getElementById('url-input').value.trim() : '';
+  if (urlVal && urlVal.startsWith('http')) {
+    const resp = await fetch('/.netlify/functions/fetch-url', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: urlVal })
+    });
+    let data;
+    try { data = await resp.json(); } catch(e) { throw new Error('Could not reach the page fetcher. Please paste text instead.'); }
+    if (!resp.ok) throw new Error(data.error || 'Could not fetch that URL. Try pasting the text instead.');
+    if (!data.text) throw new Error('Could not extract text from that page. Try copying and pasting instead.');
+    return { type: 'url', content: data.text, images: data.images || [], sourceUrl: data.sourceUrl };
+  }
   const p = document.getElementById('paste-input').value.trim();
   if (p) return { type: 'text', content: p };
-  throw new Error('Please upload a file or paste some text first.');
+  throw new Error('Please upload a file, enter a URL, or paste some text first.');
 }
 
 function readB64(file) {

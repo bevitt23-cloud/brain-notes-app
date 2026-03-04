@@ -1,90 +1,67 @@
 const https = require('https');
 const http = require('http');
 
-// Rotate through realistic browser user agents
-const USER_AGENTS = [
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Safari/605.1.15',
-];
-
-function getRandomAgent() {
-  return USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
-}
-
-function fetchPage(url, redirectCount = 0) {
+// ── Direct fetch (for sites that don't block) ──
+function directFetch(url) {
   return new Promise((resolve, reject) => {
-    if (redirectCount > 5) return reject(new Error('Too many redirects.'));
-
     const client = url.startsWith('https') ? https : http;
-
     const options = {
       headers: {
-        'User-Agent': getRandomAgent(),
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language': 'en-US,en;q=0.9',
         'Accept-Encoding': 'identity',
         'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache',
-        'Sec-Fetch-Dest': 'document',
-        'Sec-Fetch-Mode': 'navigate',
-        'Sec-Fetch-Site': 'none',
-        'Sec-Fetch-User': '?1',
         'Upgrade-Insecure-Requests': '1',
-        'Connection': 'keep-alive',
       }
     };
 
     const req = client.get(url, options, (res) => {
-      // Follow redirects
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
         let redirect = res.headers.location;
         if (redirect.startsWith('/')) {
-          try { redirect = new URL(url).origin + redirect; } catch(e) { return reject(new Error('Could not follow redirect.')); }
+          try { redirect = new URL(url).origin + redirect; } catch(e) { return reject(new Error('Redirect failed')); }
         } else if (!redirect.startsWith('http')) {
-          try { redirect = new URL(redirect, url).href; } catch(e) { return reject(new Error('Could not follow redirect.')); }
+          try { redirect = new URL(redirect, url).href; } catch(e) { return reject(new Error('Redirect failed')); }
         }
-        return fetchPage(redirect, redirectCount + 1).then(resolve).catch(reject);
+        return directFetch(redirect).then(resolve).catch(reject);
       }
-
-      if (res.statusCode === 403) {
-        return reject(new Error('This website is blocking outside access (403 Forbidden). Try copying and pasting the text instead.'));
-      }
-      if (res.statusCode === 401) {
-        return reject(new Error('This page requires a login. Try copying and pasting the text instead.'));
-      }
-      if (res.statusCode === 429) {
-        return reject(new Error('This website is rate-limiting requests. Try again in a few minutes or paste the text instead.'));
-      }
-      if (res.statusCode !== 200) {
-        return reject(new Error(`Page returned status ${res.statusCode}. Try copying and pasting the text instead.`));
-      }
-
-      // Handle encoding
+      if (res.statusCode !== 200) return reject(new Error(`Status ${res.statusCode}`));
       res.setEncoding('utf8');
       let data = '';
-      res.on('data', chunk => {
-        data += chunk;
-        // Stop after 2MB to avoid memory issues
-        if (data.length > 2000000) { req.destroy(); resolve(data); }
-      });
+      res.on('data', chunk => { data += chunk; if (data.length > 2000000) { req.destroy(); resolve(data); } });
       res.on('end', () => resolve(data));
     });
-
-    req.on('error', (err) => {
-      if (err.code === 'ENOTFOUND') return reject(new Error('Could not find that website. Check the URL and try again.'));
-      if (err.code === 'ECONNREFUSED') return reject(new Error('The website refused the connection. Try copying and pasting the text instead.'));
-      reject(new Error('Could not reach that URL. The site may be blocking outside access.'));
-    });
-
-    req.setTimeout(12000, () => {
-      req.destroy();
-      reject(new Error('Request timed out. The site may be slow or blocking access. Try copying and pasting the text instead.'));
-    });
+    req.on('error', (err) => reject(err));
+    req.setTimeout(10000, () => { req.destroy(); reject(new Error('Timeout')); });
   });
 }
 
+// ── ScrapingBee fetch (for blocked sites) ──
+function scrapingBeeFetch(url, apiKey) {
+  return new Promise((resolve, reject) => {
+    const params = new URLSearchParams({
+      api_key: apiKey,
+      url: url,
+      render_js: 'false',
+      premium_proxy: 'false',
+    });
+
+    const sbUrl = `https://app.scrapingbee.com/api/v1/?${params.toString()}`;
+
+    const req = https.get(sbUrl, { headers: { 'Accept': 'text/html' } }, (res) => {
+      if (res.statusCode !== 200) return reject(new Error(`ScrapingBee status ${res.statusCode}`));
+      res.setEncoding('utf8');
+      let data = '';
+      res.on('data', chunk => { data += chunk; });
+      res.on('end', () => resolve(data));
+    });
+    req.on('error', (err) => reject(err));
+    req.setTimeout(20000, () => { req.destroy(); reject(new Error('ScrapingBee timeout')); });
+  });
+}
+
+// ── Extract images from HTML ──
 function extractImages(html, baseUrl) {
   const images = [];
   const seen = new Set();
@@ -98,21 +75,15 @@ function extractImages(html, baseUrl) {
     const srcMatch = srcRegex.exec(tag);
     const altMatch = altRegex.exec(tag);
     if (!srcMatch) continue;
-
     let src = srcMatch[1];
     const alt = altMatch ? altMatch[1].trim() : '';
-
-    // Skip icons, logos, tracking pixels
     if (/icon|logo|pixel|tracking|\.gif$|avatar|spinner|loading|ad[_-]|banner/i.test(src)) continue;
     if (alt && /icon|logo|avatar/i.test(alt)) continue;
-
-    // Make relative URLs absolute
     try {
       if (src.startsWith('//')) src = 'https:' + src;
-      else if (src.startsWith('/')) src = new URL(baseUrl).origin + src;
+      else if (src.startsWith('/')) src = new URL(url).origin + src;
       else if (!src.startsWith('http')) src = new URL(src, baseUrl).href;
     } catch(e) { continue; }
-
     if (seen.has(src)) continue;
     seen.add(src);
     images.push({ src, alt: alt || 'Image from page' });
@@ -121,6 +92,7 @@ function extractImages(html, baseUrl) {
   return images;
 }
 
+// ── Extract readable text from HTML ──
 function extractText(html) {
   return html
     .replace(/<script[\s\S]*?<\/script>/gi, '')
@@ -146,24 +118,45 @@ exports.handler = async function(event) {
     'Access-Control-Allow-Origin': '*'
   };
 
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
-  }
-
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
-  }
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
+  if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
 
   try {
-    const body = JSON.parse(event.body || '{}');
-    const { url } = body;
-
+    const { url } = JSON.parse(event.body || '{}');
     if (!url) return { statusCode: 400, headers, body: JSON.stringify({ error: 'No URL provided' }) };
     if (!url.startsWith('http')) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Please enter a full URL starting with https://' }) };
 
-    const html = await fetchPage(url);
-    let text = extractText(html);
+    const sbKey = process.env.SCRAPINGBEE_KEY;
+    let html = null;
+    let usedScrapingBee = false;
+
+    // Try direct fetch first (free, fast)
+    try {
+      html = await directFetch(url);
+    } catch(e) {
+      // Direct fetch failed — try ScrapingBee if key is available
+      if (sbKey) {
+        try {
+          html = await scrapingBeeFetch(url, sbKey);
+          usedScrapingBee = true;
+        } catch(e2) {
+          return {
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({ error: 'Could not access that page. The site may require a login or is heavily restricted. Try copying and pasting the text instead.' })
+          };
+        }
+      } else {
+        return {
+          statusCode: 500,
+          headers,
+          body: JSON.stringify({ error: 'This website is blocking outside access. Try copying and pasting the text instead.' })
+        };
+      }
+    }
+
     const images = extractImages(html, url);
+    let text = extractText(html);
 
     if (text.length < 100) {
       return {
@@ -178,7 +171,7 @@ exports.handler = async function(event) {
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ text, images, sourceUrl: url })
+      body: JSON.stringify({ text, images, sourceUrl: url, usedScrapingBee })
     };
 
   } catch (err) {
