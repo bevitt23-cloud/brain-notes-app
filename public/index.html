@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Brain-Friendly Notes ✨</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Architects+Daughter&display=swap" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/opendyslexic" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
@@ -24,6 +25,43 @@
   --orange:#602008;--orange-bg:#1e0c04;
   --shadow:4px 4px 0px #100c06;--shadow-sm:2px 2px 0px #100c06;
 }
+
+/* ── DYSLEXIA MODE ── */
+[data-mode="dyslexic"] body,
+[data-mode="dyslexic"] input,
+[data-mode="dyslexic"] textarea,
+[data-mode="dyslexic"] button,
+[data-mode="dyslexic"] select {
+  font-family: 'OpenDyslexic', 'Nunito', sans-serif !important;
+  letter-spacing: 0.05em;
+  word-spacing: 0.15em;
+}
+[data-mode="dyslexic"] .n-chunk p,
+[data-mode="dyslexic"] .n-box p,
+[data-mode="dyslexic"] .n-list li,
+[data-mode="dyslexic"] .n-vocab-item {
+  font-family: 'OpenDyslexic', sans-serif !important;
+  line-height: 2.2 !important;
+  font-size: 1.05rem !important;
+  letter-spacing: 0.04em;
+  word-spacing: 0.2em;
+}
+[data-mode="dyslexic"] h1,
+[data-mode="dyslexic"] .n-section-title {
+  font-family: 'OpenDyslexic', sans-serif !important;
+  letter-spacing: 0.03em;
+}
+[data-mode="dyslexic"] em,
+[data-mode="dyslexic"] i { font-style: normal !important; }
+[data-mode="dyslexic"] .n-section { margin-bottom: 2.5rem !important; }
+[data-mode="dyslexic"] .n-chunk { padding: 18px 20px !important; line-height: 2.2 !important; }
+[data-mode="dyslexic"] .n-box { padding: 18px 20px !important; line-height: 2.2 !important; }
+[data-mode="dyslexic"] .n-list li { margin-bottom: 12px !important; line-height: 2.2 !important; }
+[data-mode="dyslexic"] strong { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+.mode-toggle-wrap { display:flex; align-items:center; background:var(--bg2); border:2px solid var(--border); border-radius:50px; padding:3px; gap:2px; }
+.mode-btn { padding:6px 14px; border:none; border-radius:50px; font-family:inherit; font-size:.82rem; font-weight:700; cursor:pointer; background:transparent; color:var(--muted); transition:all .2s; white-space:nowrap; }
+.mode-btn.active { background:var(--accent); color:#fff; box-shadow:var(--shadow-sm); }
+
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s;}
 
@@ -254,6 +292,10 @@ textarea::placeholder{color:var(--muted);}
 <!-- ══ TOPBAR ══ -->
 <div class="topbar">
   <div class="logo">🧠 Brain-Friendly Notes</div>
+  <div class="mode-toggle-wrap">
+    <button class="mode-btn active" id="mode-adhd" onclick="setMode('adhd')">🧠 ADHD</button>
+    <button class="mode-btn" id="mode-dyslexic" onclick="setMode('dyslexic')">📖 Dyslexia</button>
+  </div>
   <div class="topbar-actions">
     <span class="user-email hidden" id="user-email-lbl"></span>
     <button class="topbar-btn hidden" id="btn-my-notes" onclick="openNotesPanel()">📁 My Notes</button>
@@ -290,14 +332,7 @@ textarea::placeholder{color:var(--muted);}
       <span id="file-name-lbl">--</span>
       <button class="file-remove" onclick="clearFile()">✕</button>
     </div>
-    <div class="divider-or">OR</div>
-    <div class="section-label" style="margin-bottom:8px;">🔗 Paste a Website URL</div>
-    <div class="url-input-wrap">
-      <input class="url-input" type="url" id="url-input" placeholder="https://example.com/article..." oninput="onURLInput()" />
-      <button class="url-fetch-btn hidden" id="url-clear-btn" onclick="clearURL()" title="Clear URL" style="background:var(--bg2);color:var(--muted);border:2px solid var(--border);">✕</button>
-    </div>
-    <div class="drop-tip" style="margin-top:6px;">💡 Paste a URL and hit the button below -- we'll grab the text automatically!</div>
-    <div class="divider-or">OR</div>
+<div class="divider-or">OR</div>
     <textarea id="paste-input" placeholder="Paste your text here..."></textarea>
     <div class="err-box hidden" id="gen-err"></div>
     <button class="gen-btn" id="gen-btn" onclick="generateNotes()">✨ Turn Into Brain-Friendly Notes</button>
@@ -634,19 +669,6 @@ function toggleDark() {
 }
 
 
-// URL fetching is now handled inside extractText()
-
-function onURLInput() {
-  const val = document.getElementById('url-input').value.trim();
-  document.getElementById('url-clear-btn').classList.toggle('hidden', !val);
-  // Clear paste box if user is typing a URL
-  if (val) document.getElementById('paste-input').value = '';
-}
-
-function clearURL() {
-  document.getElementById('url-input').value = '';
-  document.getElementById('url-clear-btn').classList.add('hidden');
-}
 
 // ══════════════════════════════════════════════
 //  FILE HANDLING
@@ -691,23 +713,9 @@ async function extractText() {
     }
     throw new Error('Unsupported file type. Please use PDF, .docx, .txt, or an image file.');
   }
-  // Check URL input
-  const urlVal = document.getElementById('url-input').value.trim();
-  if (urlVal && urlVal.startsWith('http')) {
-    const resp = await fetch('/.netlify/functions/fetch-url', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: urlVal })
-    });
-    let data;
-    try { data = await resp.json(); } catch(e) { throw new Error('This website is blocking outside access to its content. Try copying and pasting the text directly instead.'); }
-    if (!resp.ok) throw new Error(data.error || 'This website is blocking outside access. Try copying and pasting the text instead.');
-    if (!data.text) throw new Error('Could not extract text from that page. Try copying and pasting the text instead.');
-    return { type: 'url', content: data.text, images: data.images || [], sourceUrl: data.sourceUrl };
-  }
   const p = document.getElementById('paste-input').value.trim();
   if (p) return { type: 'text', content: p };
-  throw new Error('Please upload a file, enter a URL, or paste some text first.');
+  throw new Error('Please upload a file or paste some text first.');
 }
 
 function readB64(file) {
@@ -747,9 +755,7 @@ async function generateNotes() {
 
   const btn = document.getElementById('gen-btn');
   btn.disabled = true;
-  const isURL = !!document.getElementById('url-input').value.trim();
-  document.querySelector('.loading-text').textContent = isURL ? 'Fetching page and making notes...' : 'Making your notes...';
-  document.querySelector('.loading-sub').textContent = isURL ? 'Grabbing the page content and building something easier for your brain 🧠' : 'Fetching content and building something easier for your brain 🧠';
+
   show('loading-box');
   document.getElementById('upload-section').style.opacity = '.5';
   document.getElementById('upload-section').style.pointerEvents = 'none';
@@ -780,7 +786,8 @@ async function generateNotes() {
       messages = [{role:'user',content:basePrompt + '\n\n' + (extracted.content || extracted)}];
     }
 
-    let html = await callClaude({ model:'claude-sonnet-4-20250514', max_tokens:6000, system:SYSTEM_PROMPT, messages });
+    const activePrompt = currentMode === 'dyslexic' ? DYSLEXIA_PROMPT : SYSTEM_PROMPT;
+    let html = await callClaude({ model:'claude-sonnet-4-20250514', max_tokens:6000, system:activePrompt, messages });
     const fence = html.match(/```(?:html)?\s*([\s\S]*?)```/i);
     if (fence) html = fence[1].trim();
     if (!html.includes('<')) html = `<h1>📋 Your Notes</h1><div class="n-section"><div class="n-chunk"><p>${html.replace(/\n/g,'<br>')}</p></div></div>`;
@@ -812,6 +819,36 @@ RULES:
 - IMAGES AND DIAGRAMS: When you see or detect a diagram, chart, image, or visual (from a PDF, image file, or URL), always add a pink visual description box describing what it shows in plain English. Use this format: <div class="n-box pink"><div class="n-box-label">🖼 Visual: What This Shows</div><p>Plain English description of the diagram/chart/image</p></div>. If you have a URL for the image, add a link: <a href="URL" target="_blank" rel="noopener" style="color:var(--accent);font-weight:700;">View original image</a>
 STRUCTURE: <h1>Title</h1><p class="subtitle">subtitle</p> then sections: <div class="n-section"><div class="n-section-title"><span>emoji</span> Title <span class="n-badge">Big Idea</span></div><div class="n-chunk"><p>text</p></div><div class="n-box blue"><div class="n-box-label">📘 Label</div>content</div><ul class="n-list"><li>item</li></ul></div><span class="n-pause">✅ Pause -- Got it? Move on when ready.</span> -- end with: <div class="n-section"><div class="n-section-title"><span>🔑</span> Key Terms</div><div class="n-vocab"><div class="n-vocab-item"><span class="n-vocab-term">Term</span> -- definition</div></div></div>
 Return ONLY the HTML.`;
+
+const DYSLEXIA_PROMPT = `You are an expert at converting study material into dyslexia-friendly notes. Return ONLY valid HTML using these exact CSS classes -- no markdown, no explanations.
+RULES:
+- Break into 3-7 short sections with emoji titles.
+- Use VERY short sentences -- maximum 10 words each. One idea per line. No long paragraphs.
+- Use simple, common words. Avoid jargon. If a technical word is needed, immediately define it in plain English.
+- NEVER use italics or ALL CAPS for emphasis. Use <strong> for bold instead.
+- Use .n-chunk for plain-English summaries.
+- Use .n-box with colors: blue=facts/definitions, green=steps/processes, yellow=write this down, pink=warnings/catches, purple=vocab, orange=examples.
+- Add .n-pause between every section.
+- End with a .n-vocab key terms recap with very simple definitions.
+- IMAGES AND DIAGRAMS: When you see or detect a diagram, chart, image, or visual, always add a pink visual description box. Describe it in very simple short sentences. Use this format: <div class="n-box pink"><div class="n-box-label">🖼 Visual: What This Shows</div><p>Simple description here.</p></div>
+- Use numbered lists instead of bullet points where possible.
+STRUCTURE: <h1>Title</h1><p class="subtitle">subtitle</p> then sections: <div class="n-section"><div class="n-section-title"><span>emoji</span> Title <span class="n-badge">Big Idea</span></div><div class="n-chunk"><p>text with <strong>bold key words</strong></p></div><div class="n-box blue"><div class="n-box-label">📘 Label</div>content</div><ol class="n-list"><li>item</li></ol></div><span class="n-pause">✅ Pause -- Got it? Move on when ready.</span> -- end with: <div class="n-section"><div class="n-section-title"><span>🔑</span> Key Terms</div><div class="n-vocab"><div class="n-vocab-item"><span class="n-vocab-term">Term</span> -- simple definition</div></div></div>
+Return ONLY the HTML.`;
+
+// ══════════════════════════════════════════════
+//  MODE TOGGLE
+// ══════════════════════════════════════════════
+let currentMode = 'adhd';
+
+function setMode(mode) {
+  currentMode = mode;
+  document.documentElement.setAttribute('data-mode', mode);
+  document.getElementById('mode-adhd').classList.toggle('active', mode === 'adhd');
+  document.getElementById('mode-dyslexic').classList.toggle('active', mode === 'dyslexic');
+  // Update page title hint
+  const sub = document.querySelector('.upload-section .section-label');
+  if (sub) sub.textContent = mode === 'dyslexic' ? '📂 Step 1 -- Add Your Content (Dyslexia Mode 📖)' : '📂 Step 1 -- Add Your Content';
+}
 
 // ══════════════════════════════════════════════
 //  HIGHLIGHT → EXPLAIN
