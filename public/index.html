@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
@@ -333,6 +333,12 @@ textarea::placeholder{color:var(--muted);}
       <button class="file-remove" onclick="clearFile()">✕</button>
     </div>
 <div class="divider-or">OR</div>
+    <div class="section-label" style="margin-bottom:8px;">🔗 Paste a Website URL</div>
+    <div class="url-input-wrap">
+      <input class="url-input" type="url" id="url-input" placeholder="https://example.com/article..." />
+    </div>
+    <div class="drop-tip" style="margin-top:6px;">💡 Paste a URL and hit the button below -- we'll grab the text automatically!</div>
+    <div class="divider-or">OR</div>
     <textarea id="paste-input" placeholder="Paste your text here..."></textarea>
     <div class="err-box hidden" id="gen-err"></div>
     <button class="gen-btn" id="gen-btn" onclick="generateNotes()">✨ Turn Into Brain-Friendly Notes</button>
