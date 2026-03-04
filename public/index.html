@@ -231,6 +231,79 @@ textarea::placeholder{color:var(--muted);}
 /* ── TOAST ── */
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:10px 24px;border-radius:30px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.9rem;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2);animation:fadeIn .3s ease;pointer-events:none;}
 
+
+/* ── STICKY NOTES ── */
+.sticky-note {
+  position:absolute;
+  width:220px;
+  min-height:120px;
+  border-radius:12px;
+  box-shadow:0 4px 16px rgba(0,0,0,.18);
+  display:flex;
+  flex-direction:column;
+  z-index:500;
+  font-family:'Nunito',sans-serif;
+  cursor:move;
+  transition:box-shadow .2s;
+  user-select:none;
+}
+.sticky-note:hover { box-shadow:0 8px 24px rgba(0,0,0,.22); }
+.sticky-note.minimized { min-height:0; }
+.sticky-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 10px;
+  border-radius:12px 12px 0 0;
+  background:rgba(0,0,0,0.12);
+  cursor:move;
+  gap:6px;
+}
+.sticky-note.minimized .sticky-header { border-radius:12px; }
+.sticky-handle { font-size:.75rem; font-weight:800; color:rgba(0,0,0,0.5); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sticky-actions { display:flex; gap:4px; flex-shrink:0; }
+.sticky-btn { background:rgba(0,0,0,0.15); border:none; border-radius:6px; width:22px; height:22px; cursor:pointer; font-size:.75rem; display:flex; align-items:center; justify-content:center; color:rgba(0,0,0,0.6); transition:background .15s; }
+.sticky-btn:hover { background:rgba(0,0,0,0.25); }
+.sticky-body { padding:10px 12px; flex:1; display:flex; flex-direction:column; gap:8px; }
+.sticky-note.minimized .sticky-body { display:none; }
+.sticky-textarea {
+  width:100%;
+  min-height:70px;
+  border:none;
+  background:transparent;
+  font-family:'Nunito',sans-serif;
+  font-size:.88rem;
+  color:rgba(0,0,0,0.75);
+  resize:none;
+  outline:none;
+  line-height:1.5;
+  user-select:text;
+  cursor:text;
+}
+.sticky-textarea::placeholder { color:rgba(0,0,0,0.4); }
+.sticky-colors { display:flex; gap:5px; flex-wrap:wrap; }
+.sticky-color-btn { width:18px; height:18px; border-radius:50%; border:2px solid rgba(0,0,0,0.15); cursor:pointer; transition:transform .15s; flex-shrink:0; }
+.sticky-color-btn:hover { transform:scale(1.25); }
+.sticky-color-btn.selected { border:2px solid rgba(0,0,0,0.5); transform:scale(1.15); }
+.sticky-ref { font-size:.72rem; color:rgba(0,0,0,0.45); font-style:italic; border-top:1px solid rgba(0,0,0,0.1); padding-top:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+#notes-render { position:relative; }
+.sticky-container { position:relative; min-height:0; }
+
+/* Sticky note modal */
+#sticky-modal { position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:10000; display:flex; align-items:center; justify-content:center; }
+#sticky-modal.hidden { display:none; }
+.sticky-modal-card { background:var(--card); border-radius:16px; padding:28px; width:92%; max-width:420px; box-shadow:0 8px 32px rgba(0,0,0,.2); }
+.sticky-modal-title { font-size:1.1rem; font-weight:800; color:var(--text); margin-bottom:6px; }
+.sticky-modal-ref { font-size:.82rem; color:var(--muted); font-style:italic; margin-bottom:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sticky-modal-textarea { width:100%; min-height:100px; padding:12px; border:2px solid var(--border); border-radius:10px; font-family:'Nunito',sans-serif; font-size:.95rem; color:var(--text); background:var(--bg2); resize:none; outline:none; line-height:1.6; margin-bottom:14px; }
+.sticky-modal-textarea:focus { border-color:var(--accent); }
+.sticky-modal-colors { display:flex; gap:8px; margin-bottom:18px; align-items:center; }
+.sticky-modal-color-label { font-size:.82rem; font-weight:700; color:var(--muted); margin-right:4px; }
+.sticky-modal-color-btn { width:24px; height:24px; border-radius:50%; border:2.5px solid transparent; cursor:pointer; transition:transform .15s; }
+.sticky-modal-color-btn:hover { transform:scale(1.2); }
+.sticky-modal-color-btn.selected { border-color:var(--text); transform:scale(1.15); }
+.sticky-modal-actions { display:flex; gap:10px; }
+
 @media print{.topbar,.upload-section,.output-topbar,#explain-tooltip,#explain-panel,#notes-panel,.overlay{display:none!important;}body{background:#fff;}#notes-render{border:none;box-shadow:none;padding:0;background:#fff;}}
 @media(max-width:540px){.topbar{padding:12px 14px;}.logo{font-size:1.1rem;}.main{padding:20px 12px 60px;}#notes-render{padding:16px 14px;}#notes-panel{width:100%;right:-100%;}}
 </style>
@@ -368,6 +441,7 @@ textarea::placeholder{color:var(--muted);}
 <!-- ══ EXPLAIN TOOLTIP ══ -->
 <div id="explain-tooltip">
   <button id="explain-tooltip-trigger" onclick="openExplainPanel()">💡 Explain this to me</button>
+  <button id="sticky-tooltip-trigger" onclick="openStickyModal()" style="display:flex;align-items:center;gap:8px;padding:10px 16px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;font-size:.9rem;color:var(--text);background:var(--yellow-bg);border:none;width:100%;text-align:left;transition:background .15s;border-top:1px solid var(--border);">📝 Add sticky note</button>
   <div id="explain-sel-preview"></div>
 </div>
 
@@ -382,6 +456,29 @@ textarea::placeholder{color:var(--muted);}
       <button class="explain-close-btn" onclick="closeExplainPanel()">✕ Close</button>
     </div>
     <div class="explain-body" id="explain-body"></div>
+  </div>
+</div>
+
+
+<!-- ══ STICKY NOTE MODAL ══ -->
+<div id="sticky-modal" class="hidden">
+  <div class="sticky-modal-card">
+    <div class="sticky-modal-title">📝 Add a Sticky Note</div>
+    <div class="sticky-modal-ref" id="sticky-modal-ref"></div>
+    <textarea class="sticky-modal-textarea" id="sticky-modal-text" placeholder="Type your note here..."></textarea>
+    <div class="sticky-modal-colors">
+      <span class="sticky-modal-color-label">Color:</span>
+      <div class="sticky-modal-color-btn selected" data-color="#ffe168" style="background:#ffe168;" onclick="selectStickyColor(this)"></div>
+      <div class="sticky-modal-color-btn" data-color="#c8f5d0" style="background:#c8f5d0;" onclick="selectStickyColor(this)"></div>
+      <div class="sticky-modal-color-btn" data-color="#c8e8ff" style="background:#c8e8ff;" onclick="selectStickyColor(this)"></div>
+      <div class="sticky-modal-color-btn" data-color="#ffd6e7" style="background:#ffd6e7;" onclick="selectStickyColor(this)"></div>
+      <div class="sticky-modal-color-btn" data-color="#e8d6ff" style="background:#e8d6ff;" onclick="selectStickyColor(this)"></div>
+      <div class="sticky-modal-color-btn" data-color="#ffe3c8" style="background:#ffe3c8;" onclick="selectStickyColor(this)"></div>
+    </div>
+    <div class="sticky-modal-actions">
+      <button class="mbtn" onclick="saveStickyNote()" style="flex:1;">📝 Add Note</button>
+      <button class="mbtn ghost" onclick="closeStickyModal()" style="flex:1;">Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -596,11 +693,13 @@ async function doSaveNotes() {
     folderId = data.id;
   }
 
+  const stickyData = getStickyNotesData();
   const { error } = await db.from('notes').insert({
     user_id:   currentUser.id,
     folder_id: folderId,
     title,
-    content:   currentHTML
+    content:   currentHTML,
+    metadata:  { stickyNotes: stickyData }
   });
 
   if (error) return showErr('save-err', 'Could not save: ' + error.message);
@@ -652,6 +751,9 @@ async function loadNote(id) {
   if (error || !data) return toast('Could not load note.');
   currentHTML = data.content;
   document.getElementById('notes-render').innerHTML = data.content;
+  // Restore sticky notes if any
+  const stickies = data.metadata?.stickyNotes || [];
+  setTimeout(() => restoreStickyNotes(stickies), 100);
   show('output-section');
   closeNotesPanel();
   document.getElementById('output-section').scrollIntoView({ behavior: 'smooth' });
@@ -814,6 +916,8 @@ async function generateNotes() {
 
     currentHTML = html;
     document.getElementById('notes-render').innerHTML = html;
+    // Clear any existing sticky notes for fresh generation
+    restoreStickyNotes([]);
     show('output-section');
     if (currentUser) show('save-btn');
     document.getElementById('output-section').scrollIntoView({ behavior:'smooth', block:'start' });
@@ -869,6 +973,223 @@ function setMode(mode) {
   const sub = document.querySelector('.upload-section .section-label');
   if (sub) sub.textContent = mode === 'dyslexic' ? '📂 Step 1 -- Add Your Content (Dyslexia Mode 📖)' : '📂 Step 1 -- Add Your Content';
 }
+
+
+// ══════════════════════════════════════════════
+//  STICKY NOTES
+// ══════════════════════════════════════════════
+let stickyNotes = []; // { id, text, color, ref, x, y, minimized }
+let stickyColor = '#ffe168';
+let activeStickyRef = '';
+let dragState = null;
+
+function openStickyModal() {
+  document.getElementById('sticky-modal').classList.remove('hidden');
+  document.getElementById('sticky-modal-ref').textContent = '"' + (selectedText.length > 80 ? selectedText.substring(0,80)+'...' : selectedText) + '"';
+  document.getElementById('sticky-modal-text').value = '';
+  activeStickyRef = selectedText;
+  stickyColor = '#ffe168';
+  // Reset color selection
+  document.querySelectorAll('.sticky-modal-color-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelector('.sticky-modal-color-btn[data-color="#ffe168"]').classList.add('selected');
+  document.getElementById('sticky-modal-text').focus();
+  // Hide tooltip
+  document.getElementById('explain-tooltip').classList.remove('visible');
+}
+
+function closeStickyModal() {
+  document.getElementById('sticky-modal').classList.add('hidden');
+}
+
+function selectStickyColor(btn) {
+  document.querySelectorAll('.sticky-modal-color-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  stickyColor = btn.dataset.color;
+}
+
+function saveStickyNote() {
+  const text = document.getElementById('sticky-modal-text').value.trim();
+  if (!text) return;
+  const note = {
+    id: 'sticky-' + Date.now(),
+    text,
+    color: stickyColor,
+    ref: activeStickyRef,
+    x: 20,
+    y: 20 + (stickyNotes.length * 20),
+    minimized: false
+  };
+  stickyNotes.push(note);
+  renderStickyNote(note);
+  closeStickyModal();
+}
+
+function renderStickyNote(note) {
+  const container = document.getElementById('notes-render');
+  if (!container) return;
+
+  const el = document.createElement('div');
+  el.className = 'sticky-note' + (note.minimized ? ' minimized' : '');
+  el.id = note.id;
+  el.style.cssText = `background:${note.color};left:${note.x}px;top:${note.y}px;`;
+
+  const refShort = note.ref.length > 40 ? note.ref.substring(0,40)+'...' : note.ref;
+  const textShort = note.text.length > 30 ? note.text.substring(0,30)+'...' : note.text;
+
+  el.innerHTML = `
+    <div class="sticky-header">
+      <span class="sticky-handle">${note.minimized ? textShort : '📝 My Note'}</span>
+      <div class="sticky-actions">
+        <button class="sticky-btn" onclick="toggleStickyMinimize('${note.id}')" title="${note.minimized ? 'Expand' : 'Minimize'}">${note.minimized ? '▼' : '▲'}</button>
+        <button class="sticky-btn" onclick="deleteStickyNote('${note.id}')" title="Delete">✕</button>
+      </div>
+    </div>
+    <div class="sticky-body">
+      <textarea class="sticky-textarea" placeholder="Type your note..." onmousedown="event.stopPropagation()">${note.text}</textarea>
+      <div class="sticky-colors">
+        ${['#ffe168','#c8f5d0','#c8e8ff','#ffd6e7','#e8d6ff','#ffe3c8'].map(c =>
+          `<div class="sticky-color-btn${note.color===c?' selected':''}" style="background:${c}" data-color="${c}" onclick="changeStickyColor('${note.id}','${c}',this)"></div>`
+        ).join('')}
+      </div>
+      <div class="sticky-ref">"${refShort}"</div>
+    </div>
+  `;
+
+  // Save text changes
+  const ta = el.querySelector('.sticky-textarea');
+  ta.addEventListener('input', () => {
+    const n = stickyNotes.find(s => s.id === note.id);
+    if (n) n.text = ta.value;
+  });
+
+  // Drag support
+  el.querySelector('.sticky-header').addEventListener('mousedown', startDrag);
+  el.querySelector('.sticky-header').addEventListener('touchstart', startDragTouch, {passive:true});
+
+  container.appendChild(el);
+}
+
+function toggleStickyMinimize(id) {
+  const note = stickyNotes.find(s => s.id === id);
+  if (!note) return;
+  note.minimized = !note.minimized;
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('minimized', note.minimized);
+  const btn = el.querySelector('.sticky-btn');
+  const handle = el.querySelector('.sticky-handle');
+  btn.textContent = note.minimized ? '▼' : '▲';
+  btn.title = note.minimized ? 'Expand' : 'Minimize';
+  handle.textContent = note.minimized ? (note.text.length > 30 ? note.text.substring(0,30)+'...' : note.text) : '📝 My Note';
+}
+
+function deleteStickyNote(id) {
+  stickyNotes = stickyNotes.filter(s => s.id !== id);
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+function changeStickyColor(id, color, btn) {
+  const note = stickyNotes.find(s => s.id === id);
+  if (!note) return;
+  note.color = color;
+  const el = document.getElementById(id);
+  if (el) {
+    el.style.background = color;
+    el.querySelectorAll('.sticky-color-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  }
+}
+
+// ── Drag ──
+function startDrag(e) {
+  if (e.target.closest('.sticky-btn') || e.target.closest('.sticky-textarea') || e.target.closest('.sticky-color-btn')) return;
+  const el = e.currentTarget.closest('.sticky-note');
+  const rect = el.getBoundingClientRect();
+  const containerRect = el.parentElement.getBoundingClientRect();
+  dragState = {
+    el,
+    offsetX: e.clientX - rect.left,
+    offsetY: e.clientY - rect.top,
+    containerRect
+  };
+  el.style.zIndex = 600;
+  e.preventDefault();
+}
+
+function startDragTouch(e) {
+  if (e.target.closest('.sticky-btn') || e.target.closest('.sticky-textarea') || e.target.closest('.sticky-color-btn')) return;
+  const touch = e.touches[0];
+  const el = e.currentTarget.closest('.sticky-note');
+  const rect = el.getBoundingClientRect();
+  dragState = {
+    el,
+    offsetX: touch.clientX - rect.left,
+    offsetY: touch.clientY - rect.top,
+    containerRect: el.parentElement.getBoundingClientRect()
+  };
+  el.style.zIndex = 600;
+}
+
+document.addEventListener('mousemove', e => {
+  if (!dragState) return;
+  const { el, offsetX, offsetY, containerRect } = dragState;
+  let x = e.clientX - offsetX - containerRect.left;
+  let y = e.clientY - offsetY - containerRect.top;
+  x = Math.max(0, x);
+  y = Math.max(0, y);
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  const note = stickyNotes.find(s => s.id === el.id);
+  if (note) { note.x = x; note.y = y; }
+});
+
+document.addEventListener('touchmove', e => {
+  if (!dragState) return;
+  const touch = e.touches[0];
+  const { el, offsetX, offsetY, containerRect } = dragState;
+  let x = touch.clientX - offsetX - containerRect.left;
+  let y = touch.clientY - offsetY - containerRect.top;
+  x = Math.max(0, x);
+  y = Math.max(0, y);
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  const note = stickyNotes.find(s => s.id === el.id);
+  if (note) { note.x = x; note.y = y; }
+}, {passive:true});
+
+document.addEventListener('mouseup', () => {
+  if (dragState) { dragState.el.style.zIndex = 500; dragState = null; }
+});
+document.addEventListener('touchend', () => {
+  if (dragState) { dragState.el.style.zIndex = 500; dragState = null; }
+});
+
+// ── Include sticky notes when saving ──
+function getStickyNotesData() {
+  return stickyNotes.map(n => {
+    const el = document.getElementById(n.id);
+    const ta = el ? el.querySelector('.sticky-textarea') : null;
+    return { ...n, text: ta ? ta.value : n.text };
+  });
+}
+
+// ── Restore sticky notes when loading saved notes ──
+function restoreStickyNotes(notes) {
+  // Clear existing
+  stickyNotes.forEach(n => { const el = document.getElementById(n.id); if (el) el.remove(); });
+  stickyNotes = [];
+  if (!notes || !notes.length) return;
+  notes.forEach(n => {
+    stickyNotes.push(n);
+    renderStickyNote(n);
+  });
+}
+
+// Close sticky modal on overlay click
+document.getElementById('sticky-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeStickyModal();
+});
 
 // ══════════════════════════════════════════════
 //  HIGHLIGHT → EXPLAIN
