@@ -826,7 +826,7 @@ async function extractText() {
   if (urlVal && urlVal.startsWith('http')) {
     let resp, data;
     try {
-      resp = await fetch('/.netlify/functions/fetch-url', {
+      resp = await fetch('/api/fetch-url', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: urlVal })
@@ -861,7 +861,7 @@ function readB64(file) {
 async function callClaude(payload) {
   let resp;
   try {
-    resp = await fetch('/.netlify/functions/claude', {
+    resp = await fetch('/api/claude', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
