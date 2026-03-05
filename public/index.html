@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brain-Friendly Notes ✨</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Architects+Daughter&display=swap" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/opendyslexic" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root {
+  --bg:#fdf6ec;--bg2:#fef9f2;--card:#fff;--border:#e8ddd0;--text:#2a2010;--muted:#8a7a60;
+  --accent:#f5a623;--accent2:#e8913a;--yellow:#ffe168;--yellow-bg:#fffbe6;
+  --green:#c8f5d0;--green-bg:#f0fff4;--blue:#c8e8ff;--blue-bg:#f0f8ff;
+  --pink:#ffd6e7;--pink-bg:#fff5f8;--purple:#e8d6ff;--purple-bg:#faf5ff;
+  --orange:#ffe3c8;--orange-bg:#fff8f2;
+  --shadow:4px 4px 0px #e0d0b8;--shadow-sm:2px 2px 0px #e0d0b8;--radius:16px;
+}
+[data-theme="dark"] {
+  --bg:#1a1610;--bg2:#201c14;--card:#2a2418;--border:#3a3020;--text:#f0e8d8;--muted:#a09070;
+  --accent:#f5a623;--accent2:#e8913a;--yellow:#a07800;--yellow-bg:#2a2400;
+  --green:#0a5020;--green-bg:#0a1e10;--blue:#083060;--blue-bg:#080e1e;
+  --pink:#60182a;--pink-bg:#1e0810;--purple:#381860;--purple-bg:#100818;
+  --orange:#602008;--orange-bg:#1e0c04;
+  --shadow:4px 4px 0px #100c06;--shadow-sm:2px 2px 0px #100c06;
+}
+
+/* ── DYSLEXIA MODE ── */
+[data-mode="dyslexic"] body,
+[data-mode="dyslexic"] input,
+[data-mode="dyslexic"] textarea,
+[data-mode="dyslexic"] button,
+[data-mode="dyslexic"] select {
+  font-family: 'OpenDyslexic', 'Nunito', sans-serif !important;
+  letter-spacing: 0.05em;
+  word-spacing: 0.15em;
+}
+[data-mode="dyslexic"] .n-chunk p,
+[data-mode="dyslexic"] .n-box p,
+[data-mode="dyslexic"] .n-list li,
+[data-mode="dyslexic"] .n-vocab-item {
+  font-family: 'OpenDyslexic', sans-serif !important;
+  line-height: 2.2 !important;
+  font-size: 1.05rem !important;
+  letter-spacing: 0.04em;
+  word-spacing: 0.2em;
+}
+[data-mode="dyslexic"] h1,
+[data-mode="dyslexic"] .n-section-title {
+  font-family: 'OpenDyslexic', sans-serif !important;
+  letter-spacing: 0.03em;
+}
+[data-mode="dyslexic"] em,
+[data-mode="dyslexic"] i { font-style: normal !important; }
+[data-mode="dyslexic"] .n-section { margin-bottom: 2.5rem !important; }
+[data-mode="dyslexic"] .n-chunk { padding: 18px 20px !important; line-height: 2.2 !important; }
+[data-mode="dyslexic"] .n-box { padding: 18px 20px !important; line-height: 2.2 !important; }
+[data-mode="dyslexic"] .n-list li { margin-bottom: 12px !important; line-height: 2.2 !important; }
+[data-mode="dyslexic"] strong { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+.mode-toggle-wrap { display:flex; align-items:center; background:var(--bg2); border:2px solid var(--border); border-radius:50px; padding:3px; gap:2px; }
+.mode-btn { padding:6px 14px; border:none; border-radius:50px; font-family:inherit; font-size:.82rem; font-weight:700; cursor:pointer; background:transparent; color:var(--muted); transition:all .2s; white-space:nowrap; }
+.mode-btn.active { background:var(--accent); color:#fff; box-shadow:var(--shadow-sm); }
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s;}
+
+/* ── UTILS ── */
+.hidden{display:none!important;}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--card);border-bottom:2px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.06);}.topbar .logo{flex-shrink:0;}.topbar .topbar-actions{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.logo{font-family:'Architects Daughter',cursive;font-size:1.4rem;color:var(--accent);display:flex;align-items:center;gap:8px;}
+.topbar-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.topbar-btn{background:var(--bg2);border:2px solid var(--border);border-radius:30px;padding:6px 14px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:.85rem;color:var(--text);display:flex;align-items:center;gap:6px;transition:all .2s;}
+.topbar-btn:hover{border-color:var(--accent);color:var(--accent);}
+.user-email{font-size:.78rem;color:var(--muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* ── MODAL OVERLAY ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;}
+.overlay.hidden{display:none!important;}
+.mcard{background:var(--card);border:2px solid var(--border);border-radius:20px;padding:32px 28px;max-width:440px;width:100%;box-shadow:var(--shadow);animation:popIn .2s ease;}
+@keyframes popIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+.mtitle{font-family:'Architects Daughter',cursive;font-size:1.5rem;color:var(--accent);text-align:center;margin-bottom:6px;}
+.msub{text-align:center;color:var(--muted);font-size:.88rem;margin-bottom:20px;line-height:1.5;}
+.mtabs{display:flex;gap:8px;margin-bottom:18px;}
+.mtab{flex:1;padding:9px;border:2px solid var(--border);border-radius:10px;background:var(--bg2);font-family:'Nunito',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;color:var(--muted);transition:all .15s;}
+.mtab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.minput{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:.95rem;color:var(--text);background:var(--bg2);margin-bottom:12px;transition:border-color .2s;display:block;}
+.minput:focus{outline:none;border-color:var(--accent);}
+.minput::placeholder{color:var(--muted);}
+.mbtn{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-family:'Architects Daughter',cursive;font-size:1.1rem;cursor:pointer;box-shadow:0 4px 0 var(--accent2);transition:all .15s;margin-bottom:10px;display:block;}
+.mbtn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--accent2);}
+.mbtn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--accent2);}
+.mbtn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.mbtn.ghost{background:var(--bg2);color:var(--text);box-shadow:none;border:2px solid var(--border);}
+.mbtn.ghost:hover{border-color:var(--accent);color:var(--accent);transform:none;box-shadow:none;}
+.merr{background:var(--pink-bg);border:1.5px solid var(--pink);border-radius:8px;padding:10px 12px;font-size:.84rem;color:var(--text);margin-bottom:10px;line-height:1.5;}
+.mok{background:var(--green-bg);border:1.5px solid var(--green);border-radius:8px;padding:10px 12px;font-size:.84rem;color:var(--text);margin-bottom:10px;line-height:1.5;}
+.mlink{text-align:center;font-size:.83rem;color:var(--accent);cursor:pointer;font-weight:700;display:block;margin-top:4px;}
+.mlink:hover{text-decoration:underline;}
+.mselect{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:.95rem;color:var(--text);background:var(--bg2);margin-bottom:12px;display:block;}
+.mselect:focus{outline:none;border-color:var(--accent);}
+
+/* ── NOTES PANEL (slide-in) ── */
+#notes-panel{position:fixed;top:0;right:-400px;width:360px;height:100vh;background:var(--card);border-left:2px solid var(--border);z-index:400;transition:right .3s ease;box-shadow:-4px 0 20px rgba(0,0,0,.12);display:flex;flex-direction:column;}
+#notes-panel.open{right:0;}
+.panel-header{padding:18px 20px;border-bottom:2px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.panel-title{font-family:'Architects Daughter',cursive;font-size:1.1rem;color:var(--accent);}
+.panel-close{background:none;border:2px solid var(--border);border-radius:30px;padding:4px 12px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:.8rem;color:var(--muted);transition:all .15s;}
+.panel-close:hover{border-color:var(--accent);color:var(--accent);}
+.panel-body{flex:1;overflow-y:auto;padding:16px;}
+.folder-group{margin-bottom:18px;}
+.folder-label{font-weight:800;font-size:.88rem;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.4px;}
+.note-item{background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px;}
+.note-item:hover{border-color:var(--accent);background:var(--yellow-bg);}
+.note-info{flex:1;min-width:0;}
+.note-item-title{font-size:.88rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.note-item-date{font-size:.72rem;color:var(--muted);margin-top:2px;}
+.note-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;padding:4px 6px;border-radius:6px;transition:all .15s;flex-shrink:0;}
+.note-del:hover{color:#e04040;background:var(--pink-bg);}
+.panel-empty{text-align:center;color:var(--muted);font-size:.88rem;padding:40px 16px;line-height:1.7;}
+
+/* ── MAIN ── */
+.main{max-width:860px;margin:0 auto;padding:32px 20px 80px;}
+
+/* ── UPLOAD ── */
+.upload-section{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:28px;margin-bottom:24px;box-shadow:var(--shadow);}
+.section-label{font-family:'Architects Daughter',cursive;font-size:1.1rem;color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.drop-zone{border:3px dashed var(--accent);border-radius:12px;padding:36px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--yellow-bg);position:relative;}
+.drop-zone:hover,.drop-zone.dragover{background:var(--yellow);border-color:var(--accent2);transform:scale(1.01);}
+.drop-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.drop-icon{font-size:2.5rem;margin-bottom:10px;}
+.drop-text{font-weight:700;font-size:1rem;color:var(--text);}
+.drop-sub{font-size:.82rem;color:var(--muted);margin-top:4px;}
+.drop-tip{font-size:.82rem;color:#b08a30;margin-top:6px;}
+.divider-or{text-align:center;color:var(--muted);font-weight:700;font-size:.85rem;margin:16px 0;position:relative;}
+.divider-or::before,.divider-or::after{content:'';position:absolute;top:50%;width:44%;height:1px;background:var(--border);}
+.divider-or::before{left:0;}.divider-or::after{right:0;}
+textarea{width:100%;min-height:130px;border:2px solid var(--border);border-radius:12px;padding:14px 16px;font-family:'Nunito',sans-serif;font-size:.95rem;color:var(--text);background:var(--bg2);resize:vertical;transition:border-color .2s;line-height:1.6;}
+textarea:focus{outline:none;border-color:var(--accent);}
+textarea::placeholder{color:var(--muted);}
+.file-preview{background:var(--green-bg);border:1.5px solid var(--green);border-radius:10px;padding:10px 14px;margin-top:12px;font-size:.88rem;font-weight:700;color:var(--text);display:none;align-items:center;gap:10px;}
+.file-preview.visible{display:flex;}
+.file-remove{margin-left:auto;cursor:pointer;color:var(--muted);font-size:1.1rem;background:none;border:none;font-weight:900;}
+.gen-btn{width:100%;padding:16px;background:var(--accent);color:#fff;border:none;border-radius:14px;font-family:'Architects Daughter',cursive;font-size:1.2rem;cursor:pointer;box-shadow:0 4px 0 var(--accent2);transition:all .15s;margin-top:18px;display:flex;align-items:center;justify-content:center;gap:10px;}
+.gen-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--accent2);}
+.gen-btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--accent2);}
+.gen-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+.url-input-wrap{display:flex;gap:8px;margin-top:0;}
+.url-input{flex:1;padding:12px 16px;border:2px solid var(--border);border-radius:12px;font-family:'Nunito',sans-serif;font-size:.95rem;color:var(--text);background:var(--bg2);transition:border-color .2s;}
+.url-input:focus{outline:none;border-color:var(--accent);}
+.url-input::placeholder{color:var(--muted);}
+.url-fetch-btn{padding:12px 18px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.url-fetch-btn:hover{background:var(--accent2);}
+.url-fetch-btn:disabled{opacity:.6;cursor:not-allowed;}
+.url-ok{background:var(--green-bg);border:1.5px solid var(--green);border-radius:10px;padding:9px 13px;font-size:.85rem;color:var(--text);margin-top:8px;}
+.err-box{background:var(--pink-bg);border:2px solid var(--pink);border-radius:12px;padding:16px 20px;font-size:.92rem;color:var(--text);margin-top:16px;line-height:1.5;}
+
+/* ── LOADING ── */
+.loading-box{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:40px 28px;text-align:center;box-shadow:var(--shadow);margin-bottom:24px;}
+.spinner{width:48px;height:48px;border:5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-family:'Architects Daughter',cursive;font-size:1.1rem;color:var(--accent);margin-bottom:6px;}
+.loading-sub{font-size:.85rem;color:var(--muted);}
+
+/* ── OUTPUT ── */
+.output-section{animation:fadeIn .4s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.output-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.output-title{font-family:'Architects Daughter',cursive;font-size:1.2rem;color:var(--text);}
+.action-btns{display:flex;gap:10px;flex-wrap:wrap;}
+.btn{padding:8px 18px;border-radius:30px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;border:2px solid var(--border);background:var(--card);color:var(--text);display:flex;align-items:center;gap:6px;transition:all .15s;box-shadow:var(--shadow-sm);}
+.btn:hover{border-color:var(--accent);color:var(--accent);}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn.primary:hover{background:var(--accent2);border-color:var(--accent2);color:#fff;}
+
+/* ── NOTES RENDER ── */
+#notes-render{background:var(--bg2);border:2px solid var(--border);border-radius:var(--radius);padding:28px 24px;box-shadow:var(--shadow);}
+#notes-render h1{font-family:'Architects Daughter',cursive;font-size:1.8rem;text-align:center;margin-bottom:4px;color:var(--text);}
+#notes-render .subtitle{text-align:center;color:var(--muted);font-size:.88rem;margin-bottom:28px;}
+#notes-render .n-section{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:20px;box-shadow:var(--shadow-sm);}
+#notes-render .n-section-title{font-size:1.05rem;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+#notes-render .n-badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.72rem;font-weight:700;text-transform:uppercase;background:var(--yellow);color:#6a4400;}
+#notes-render .n-chunk{border-left:4px solid var(--accent);background:var(--yellow-bg);padding:10px 14px;border-radius:0 10px 10px 0;margin-bottom:12px;font-size:.95rem;line-height:1.65;color:var(--text);}
+#notes-render .n-box{border-radius:10px;padding:12px 14px;margin-top:10px;font-size:.91rem;line-height:1.6;color:var(--text);}
+#notes-render .n-box-label{font-weight:800;font-size:.78rem;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;}
+#notes-render .n-box.yellow{background:var(--yellow-bg);border:1.5px dashed var(--accent);}
+#notes-render .n-box.green{background:var(--green-bg);border:1.5px dashed #4caf7d;}
+#notes-render .n-box.blue{background:var(--blue-bg);border:1.5px dashed #4a90c4;}
+#notes-render .n-box.pink{background:var(--pink-bg);border:1.5px dashed #d46895;}
+#notes-render .n-box.purple{background:var(--purple-bg);border:1.5px dashed #9b6dd6;}
+#notes-render .n-box.orange{background:var(--orange-bg);border:1.5px dashed #d48a3a;}
+#notes-render .n-highlight{display:inline;background:var(--yellow);padding:1px 4px;border-radius:4px;font-weight:700;color:#5a3a00;}
+#notes-render .n-list{list-style:none;padding:0;margin-top:6px;}
+#notes-render .n-list li{padding:5px 0 5px 20px;position:relative;font-size:.93rem;}
+#notes-render .n-list li::before{content:"→";position:absolute;left:0;color:var(--accent);font-weight:700;}
+#notes-render .n-pause{text-align:center;font-family:'Architects Daughter',cursive;font-size:.82rem;color:#6a4400;background:var(--yellow);display:block;width:fit-content;margin:6px auto 18px;padding:4px 16px;border-radius:20px;}
+#notes-render .n-vocab{display:flex;flex-direction:column;gap:9px;}
+#notes-render .n-vocab-item{background:var(--purple-bg);border:1.5px solid var(--purple);border-radius:10px;padding:9px 13px;font-size:.91rem;color:var(--text);}
+#notes-render .n-vocab-term{font-weight:800;color:#6a2ab5;font-size:.97rem;}
+[data-theme="dark"] #notes-render .n-vocab-term{color:#c090ff;}
+[data-theme="dark"] #notes-render .n-highlight{color:#1a0e00;}
+[data-theme="dark"] #notes-render .n-pause{color:#1a0e00;}
+[data-theme="dark"] #notes-render .n-badge{color:#1a0e00;}
+
+/* ── EXPLAIN TOOLTIP ── */
+#explain-tooltip{position:fixed;z-index:9999;background:var(--card);border:2.5px solid var(--accent);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.18);display:none;flex-direction:column;width:280px;overflow:hidden;}
+#explain-tooltip.visible{display:flex;}
+#explain-tooltip-trigger{display:flex;align-items:center;gap:8px;padding:10px 16px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;font-size:.9rem;color:var(--text);background:var(--yellow-bg);border:none;width:100%;text-align:left;transition:background .15s;}
+#explain-tooltip-trigger:hover{background:var(--yellow);}
+#explain-sel-preview{font-size:.75rem;color:var(--muted);padding:0 16px 10px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:var(--yellow-bg);}
+
+/* ── EXPLAIN PANEL ── */
+#explain-panel{position:fixed;bottom:0;left:0;right:0;z-index:9998;background:var(--card);border-top:3px solid var(--accent);box-shadow:0 -4px 24px rgba(0,0,0,.15);max-height:55vh;overflow-y:auto;}
+.explain-inner{max-width:860px;margin:0 auto;padding:20px 24px 32px;}
+.explain-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}
+.explain-title{font-family:'Architects Daughter',cursive;font-size:1rem;color:var(--accent);}
+.explain-q{font-size:.82rem;color:var(--muted);margin-top:2px;font-style:italic;}
+.explain-close-btn{background:none;border:2px solid var(--border);border-radius:30px;padding:4px 12px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;color:var(--muted);flex-shrink:0;transition:all .15s;}
+.explain-close-btn:hover{border-color:var(--accent);color:var(--accent);}
+.explain-body{font-size:.95rem;line-height:1.7;color:var(--text);}
+.explain-body .e-box{border-radius:10px;padding:11px 14px;margin-top:10px;font-size:.91rem;line-height:1.6;}
+.explain-body .e-box.yellow{background:var(--yellow-bg);border:1.5px dashed var(--accent);}
+.explain-body .e-box.blue{background:var(--blue-bg);border:1.5px dashed #4a90c4;}
+.explain-body .e-box.green{background:var(--green-bg);border:1.5px dashed #4caf7d;}
+.explain-spin-wrap{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:.9rem;padding:8px 0;}
+.explain-spinner{width:20px;height:20px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:10px 24px;border-radius:30px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.9rem;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2);animation:fadeIn .3s ease;pointer-events:none;}
+
+
+/* ── STICKY NOTES ── */
+.sticky-note {
+  position:fixed;
+  width:220px;
+  min-height:120px;
+  border-radius:12px;
+  box-shadow:0 4px 16px rgba(0,0,0,.18);
+  display:flex;
+  flex-direction:column;
+  z-index:500;
+  font-family:'Nunito',sans-serif;
+  cursor:move;
+  transition:box-shadow .2s;
+  user-select:none;
+}
+.sticky-note:hover { box-shadow:0 8px 24px rgba(0,0,0,.22); }
+.sticky-note.minimized { min-height:0; }
+.sticky-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 10px;
+  border-radius:12px 12px 0 0;
+  background:rgba(0,0,0,0.12);
+  cursor:move;
+  gap:6px;
+}
+.sticky-note.minimized .sticky-header { border-radius:12px; }
+.sticky-handle { font-size:.75rem; font-weight:800; color:rgba(0,0,0,0.5); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sticky-actions { display:flex; gap:4px; flex-shrink:0; }
+.sticky-btn { background:rgba(0,0,0,0.15); border:none; border-radius:6px; width:22px; height:22px; cursor:pointer; font-size:.75rem; display:flex; align-items:center; justify-content:center; color:rgba(0,0,0,0.6); transition:background .15s; }
+.sticky-btn:hover { background:rgba(0,0,0,0.25); }
+.sticky-body { padding:10px 12px; flex:1; display:flex; flex-direction:column; gap:8px; }
+.sticky-note.minimized .sticky-body { display:none; }
+.sticky-textarea {
+  width:100%;
+  min-height:70px;
+  border:none;
+  background:transparent;
+  font-family:'Nunito',sans-serif;
+  font-size:.88rem;
+  color:rgba(0,0,0,0.75);
+  resize:none;
+  outline:none;
+  line-height:1.5;
+  user-select:text;
+  cursor:text;
+}
+.sticky-textarea::placeholder { color:rgba(0,0,0,0.4); }
+.sticky-colors { display:flex; gap:5px; flex-wrap:wrap; }
+.sticky-color-btn { width:18px; height:18px; border-radius:50%; border:2px solid rgba(0,0,0,0.15); cursor:pointer; transition:transform .15s; flex-shrink:0; }
+.sticky-color-btn:hover { transform:scale(1.25); }
+.sticky-color-btn.selected { border:2px solid rgba(0,0,0,0.5); transform:scale(1.15); }
+.sticky-ref { font-size:.72rem; color:rgba(0,0,0,0.45); font-style:italic; border-top:1px solid rgba(0,0,0,0.1); padding-top:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+#notes-render { position:relative; }
+.sticky-container { position:relative; min-height:0; }
+
+/* Sticky note modal */
+#sticky-modal { position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:10000; display:flex; align-items:center; justify-content:center; }
+#sticky-modal.hidden { display:none; }
+.sticky-modal-card { background:var(--card); border-radius:16px; padding:28px; width:92%; max-width:420px; box-shadow:0 8px 32px rgba(0,0,0,.2); }
+.sticky-modal-title { font-size:1.1rem; font-weight:800; color:var(--text); margin-bottom:6px; }
+.sticky-modal-ref { font-size:.82rem; color:var(--muted); font-style:italic; margin-bottom:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sticky-modal-textarea { width:100%; min-height:100px; padding:12px; border:2px solid var(--border); border-radius:10px; font-family:'Nunito',sans-serif; font-size:.95rem; color:var(--text); background:var(--bg2); resize:none; outline:none; line-height:1.6; margin-bottom:14px; }
+.sticky-modal-textarea:focus { border-color:var(--accent); }
+.sticky-modal-colors { display:flex; gap:8px; margin-bottom:18px; align-items:center; }
+.sticky-modal-color-label { font-size:.82rem; font-weight:700; color:var(--muted); margin-right:4px; }
+.sticky-modal-color-btn { width:24px; height:24px; border-radius:50%; border:2.5px solid transparent; cursor:pointer; transition:transform .15s; }
+.sticky-modal-color-btn:hover { transform:scale(1.2); }
+.sticky-modal-color-btn.selected { border-color:var(--text); transform:scale(1.15); }
+.sticky-modal-actions { display:flex; gap:10px; }
+
+@media print{.topbar,.upload-section,.output-topbar,#explain-tooltip,#explain-panel,#notes-panel,.overlay{display:none!important;}body{background:#fff;}#notes-render{border:none;box-shadow:none;padding:0;background:#fff;}}
+@media(max-width:540px){.topbar{padding:12px 14px;}.logo{font-size:1.1rem;}.main{padding:20px 12px 60px;}#notes-render{padding:16px 14px;}#notes-panel{width:100%;right:-100%;}}
+</style>
+</head>
+<body>
+
+<!-- ══ AUTH MODAL ══ -->
+<div class="overlay" id="auth-overlay">
+  <div class="mcard" id="auth-card">
+
+    <!-- SIGN IN / SIGN UP VIEW -->
+    <div id="view-login">
+      <div class="mtitle">🧠 Brain-Friendly Notes</div>
+      <div class="msub">Sign in to save and access your notes from anywhere</div>
+      <div class="mtabs">
+        <button class="mtab active" id="tab-in" onclick="setTab('in')">Sign In</button>
+        <button class="mtab" id="tab-up" onclick="setTab('up')">Sign Up</button>
+      </div>
+      <div class="merr hidden" id="auth-err"></div>
+      <div class="mok hidden" id="auth-ok"></div>
+      <input class="minput" type="email" id="auth-email" placeholder="Email address" />
+      <input class="minput" type="password" id="auth-pass" placeholder="Password (min 6 characters)" />
+      <button class="mbtn" id="auth-submit-btn" onclick="doAuth()">Sign In</button>
+      <span class="mlink" onclick="setView('forgot')">Forgot password?</span>
+      <span class="mlink" style="color:var(--muted);font-weight:400;margin-top:10px;" onclick="skipAuth()">Skip for now -- notes won't be saved</span>
+    </div>
+
+    <!-- FORGOT PASSWORD VIEW -->
+    <div id="view-forgot" class="hidden">
+      <div class="mtitle">🔑 Reset Password</div>
+      <div class="msub">Enter your email and we'll send you a reset link</div>
+      <div class="merr hidden" id="forgot-err"></div>
+      <div class="mok hidden" id="forgot-ok"></div>
+      <input class="minput" type="email" id="forgot-email" placeholder="Email address" />
+      <button class="mbtn" onclick="doForgot()">Send Reset Link</button>
+      <span class="mlink" onclick="setView('login')">← Back to Sign In</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ SAVE MODAL ══ -->
+<div class="overlay hidden" id="save-overlay">
+  <div class="mcard">
+    <div class="mtitle">💾 Save Your Notes</div>
+    <div class="msub">Give your notes a title and choose a folder</div>
+    <div class="merr hidden" id="save-err"></div>
+    <input class="minput" type="text" id="save-title" placeholder="Note title (e.g. Chapter 3 - Closing the Loan)" />
+    <select class="mselect" id="save-folder-sel"></select>
+    <div id="new-folder-wrap" class="hidden">
+      <input class="minput" type="text" id="new-folder-name" placeholder="New folder name (e.g. Real Estate Exam)" />
+    </div>
+    <span class="mlink" id="new-folder-toggle" onclick="toggleNewFolder()">+ Create new folder</span>
+    <button class="mbtn" onclick="doSaveNotes()" style="margin-top:14px;">💾 Save Notes</button>
+    <button class="mbtn ghost" onclick="closeSaveModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- ══ TOPBAR ══ -->
+<div class="topbar">
+  <div class="logo">🧠 Brain-Friendly Notes</div>
+  <div class="mode-toggle-wrap">
+    <button class="mode-btn active" id="mode-adhd" onclick="setMode('adhd')">🧠 ADHD</button>
+    <button class="mode-btn" id="mode-dyslexic" onclick="setMode('dyslexic')">📖 Dyslexia</button>
+  </div>
+  <div class="topbar-actions">
+    <span class="user-email hidden" id="user-email-lbl"></span>
+    <button class="topbar-btn hidden" id="btn-my-notes" onclick="openNotesPanel()">📁 My Notes</button>
+    <button class="topbar-btn hidden" id="btn-signout" onclick="doSignOut()">Sign Out</button>
+    <button class="topbar-btn hidden" id="btn-signin-top" onclick="showAuthModal()">Sign In</button>
+    <button class="topbar-btn" onclick="toggleDark()"><span id="theme-icon">🌙</span> <span id="theme-lbl">Dark Mode</span></button>
+  </div>
+</div>
+
+<!-- ══ SAVED NOTES PANEL ══ -->
+<div id="notes-panel">
+  <div class="panel-header">
+    <div class="panel-title">📁 My Saved Notes</div>
+    <button class="panel-close" onclick="closeNotesPanel()">✕ Close</button>
+  </div>
+  <div class="panel-body" id="panel-body">
+    <div class="panel-empty">Loading...</div>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+
+  <div class="upload-section" id="upload-section">
+    <div class="section-label">📂 Step 1 -- Add Your Content</div>
+    <div class="drop-zone" id="drop-zone">
+      <input type="file" id="file-input" accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.gif" />
+      <div class="drop-icon">📄</div>
+      <div class="drop-text">Drop a file here, or click to browse</div>
+      <div class="drop-sub">Supports: PDF, Word (.docx), .txt, or image files (JPG, PNG)</div>
+      <div class="drop-tip">💡 Tip: If your PDF is very long, paste one section of text instead</div>
+    </div>
+    <div class="file-preview hidden" id="file-preview">
+      <span id="file-name-lbl">--</span>
+      <button class="file-remove" onclick="clearFile()">✕</button>
+    </div>
+<div class="divider-or">OR</div>
+    <div class="section-label" style="margin-bottom:8px;">🔗 Paste a Website URL</div>
+    <div class="url-input-wrap">
+      <input class="url-input" type="url" id="url-input" placeholder="https://example.com/article..." />
+    </div>
+    <div class="drop-tip" style="margin-top:6px;">💡 Paste a URL and hit the button below -- we'll grab the text automatically!</div>
+    <div class="divider-or">OR</div>
+    <textarea id="paste-input" placeholder="Paste your text here..."></textarea>
+    <div class="err-box hidden" id="gen-err"></div>
+    <button class="gen-btn" id="gen-btn" onclick="generateNotes()">✨ Turn Into Brain-Friendly Notes</button>
+  </div>
+
+  <div class="loading-box hidden" id="loading-box">
+    <div class="spinner"></div>
+    <div class="loading-text">Making your notes...</div>
+    <div class="loading-sub">Fetching content and building something easier for your brain 🧠</div>
+  </div>
+
+  <div class="output-section hidden" id="output-section">
+    <div class="output-topbar">
+      <div class="output-title">📋 Your Notes are Ready!</div>
+      <div class="action-btns">
+        <button class="btn hidden" id="save-btn" onclick="openSaveModal()">💾 Save</button>
+        <button class="btn" onclick="window.print()">🖨️ Print</button>
+        <button class="btn" onclick="downloadNotes()">⬇️ Download</button>
+        <button class="btn primary" onclick="resetApp()">✏️ New Notes</button>
+      </div>
+    </div>
+    <div id="notes-render"></div>
+  </div>
+
+</div>
+
+<!-- ══ EXPLAIN TOOLTIP ══ -->
+<div id="explain-tooltip">
+  <button id="explain-tooltip-trigger" onclick="openExplainPanel()">💡 Explain this to me</button>
+  <button id="sticky-tooltip-trigger" onclick="openStickyModal()" style="display:flex;align-items:center;gap:8px;padding:10px 16px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;font-size:.9rem;color:var(--text);background:var(--yellow-bg);border:none;width:100%;text-align:left;transition:background .15s;border-top:1px solid var(--border);">📝 Add sticky note</button>
+  <div id="explain-sel-preview"></div>
+</div>
+
+<!-- ══ EXPLAIN PANEL ══ -->
+<div id="explain-panel" class="hidden">
+  <div class="explain-inner">
+    <div class="explain-hdr">
+      <div>
+        <div class="explain-title">💡 Here's what that means</div>
+        <div class="explain-q" id="explain-q"></div>
+      </div>
+      <button class="explain-close-btn" onclick="closeExplainPanel()">✕ Close</button>
+    </div>
+    <div class="explain-body" id="explain-body"></div>
+  </div>
+</div>
+
+
+<!-- ══ STICKY NOTE MODAL ══ -->
+<div id="sticky-modal" class="hidden">
+  <div class="sticky-modal-card">
+    <div class="sticky-modal-title">📝 Add a Sticky Note</div>
+    <div class="sticky-modal-ref" id="sticky-modal-ref"></div>
+    <textarea class="sticky-modal-textarea" id="sticky-modal-text" placeholder="Type your note here..."></textarea>
+    <div class="sticky-modal-colors">
+      <span class="sticky-modal-color-label">Color:</span>
+      <div class="sticky-modal-color-btn selected" data-color="#ffe168" style="background:#ffe168;" onclick="selectStickyColor(this)"></div>
+      <div class="sticky-modal-color-btn" data-color="#c8f5d0" style="background:#c8f5d0;" onclick="selectStickyColor(this)"></div>
+      <div class="sticky-modal-color-btn" data-color="#c8e8ff" style="background:#c8e8ff;" onclick="selectStickyColor(this)"></div>
+      <div class="sticky-modal-color-btn" data-color="#ffd6e7" style="background:#ffd6e7;" onclick="selectStickyColor(this)"></div>
+      <div class="sticky-modal-color-btn" data-color="#e8d6ff" style="background:#e8d6ff;" onclick="selectStickyColor(this)"></div>
+      <div class="sticky-modal-color-btn" data-color="#ffe3c8" style="background:#ffe3c8;" onclick="selectStickyColor(this)"></div>
+    </div>
+    <div class="sticky-modal-actions">
+      <button class="mbtn" onclick="saveStickyNote()" style="flex:1;">📝 Add Note</button>
+      <button class="mbtn ghost" onclick="closeStickyModal()" style="flex:1;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════════
+const SB_URL  = 'https://epagtlrtzwdvferumowx.supabase.co';
+const SB_KEY  = 'sb_publishable_JLHb8iewqq_RbrmZc5dmHg_KmNRSRra';
+
+// ══════════════════════════════════════════════
+//  SUPABASE INIT
+// ══════════════════════════════════════════════
+const db = window.supabase.createClient(SB_URL, SB_KEY);
+
+// ══════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════
+let currentUser   = null;
+let currentHTML   = '';
+let selectedFile  = null;
+let selectedText  = '';
+let newFolderOpen = false;
+let dark          = false;
+
+// ══════════════════════════════════════════════
+//  AUTH -- init
+// ══════════════════════════════════════════════
+(async function initAuth() {
+  const { data: { session } } = await db.auth.getSession();
+  if (session?.user) {
+    onSignedIn(session.user);
+  } else {
+    show('auth-overlay');
+    show('btn-signin-top');
+  }
+
+  db.auth.onAuthStateChange((_e, session) => {
+    if (session?.user) onSignedIn(session.user);
+  });
+})();
+
+function onSignedIn(user) {
+  currentUser = user;
+  hide('auth-overlay');
+  hide('btn-signin-top');
+  setText('user-email-lbl', user.email);
+  show('user-email-lbl');
+  show('btn-my-notes');
+  show('btn-signout');
+  if (currentHTML) show('save-btn');
+}
+
+function onSignedOut() {
+  currentUser = null;
+  hide('user-email-lbl');
+  hide('btn-my-notes');
+  hide('btn-signout');
+  hide('save-btn');
+  show('btn-signin-top');
+}
+
+// ══════════════════════════════════════════════
+//  AUTH -- view switcher
+// ══════════════════════════════════════════════
+let activeTab = 'in';
+
+function setView(v) {
+  if (v === 'login') { show('view-login'); hide('view-forgot'); }
+  else               { hide('view-login'); show('view-forgot'); }
+  clearMsgs();
+}
+
+function setTab(t) {
+  activeTab = t;
+  document.getElementById('tab-in').classList.toggle('active', t === 'in');
+  document.getElementById('tab-up').classList.toggle('active', t === 'up');
+  setText('auth-submit-btn', t === 'in' ? 'Sign In' : 'Create Account');
+  clearMsgs();
+}
+
+function clearMsgs() {
+  ['auth-err','auth-ok','forgot-err','forgot-ok'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = ''; el.classList.add('hidden'); }
+  });
+}
+
+function showAuthModal() {
+  setView('login');
+  show('auth-overlay');
+}
+
+function skipAuth() {
+  hide('auth-overlay');
+  show('btn-signin-top');
+}
+
+// ══════════════════════════════════════════════
+//  AUTH -- sign in / sign up
+// ══════════════════════════════════════════════
+async function doAuth() {
+  const email    = val('auth-email').trim();
+  const password = val('auth-pass');
+  clearMsgs();
+
+  if (!email || !password) {
+    return showErr('auth-err', 'Please enter your email and password.');
+  }
+
+  const btn = document.getElementById('auth-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Please wait...';
+
+  if (activeTab === 'up') {
+    const { error } = await db.auth.signUp({ email, password });
+    btn.disabled = false;
+    btn.textContent = 'Create Account';
+    if (error) return showErr('auth-err', error.message);
+    showOk('auth-ok', '✅ Account created! Check your email to confirm, then sign in.');
+  } else {
+    const { data, error } = await db.auth.signInWithPassword({ email, password });
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+    if (error) return showErr('auth-err', error.message);
+    if (data?.user) onSignedIn(data.user);
+  }
+}
+
+// ══════════════════════════════════════════════
+//  AUTH -- forgot password
+// ══════════════════════════════════════════════
+async function doForgot() {
+  const email = val('forgot-email').trim();
+  clearMsgs();
+  if (!email) return showErr('forgot-err', 'Please enter your email address.');
+
+  const { error } = await db.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin
+  });
+  if (error) return showErr('forgot-err', error.message);
+  showOk('forgot-ok', '✅ Reset link sent! Check your inbox (and spam folder).');
+}
+
+// ══════════════════════════════════════════════
+//  AUTH -- sign out
+// ══════════════════════════════════════════════
+async function doSignOut() {
+  await db.auth.signOut();
+  onSignedOut();
+}
+
+// ══════════════════════════════════════════════
+//  SAVE NOTES MODAL
+// ══════════════════════════════════════════════
+async function openSaveModal() {
+  if (!currentUser) { showAuthModal(); return; }
+  document.getElementById('save-title').value = '';
+  document.getElementById('new-folder-name').value = '';
+  hide('save-err');
+  hide('new-folder-wrap');
+  newFolderOpen = false;
+  setText('new-folder-toggle', '+ Create new folder');
+  await populateFolders();
+  show('save-overlay');
+}
+
+function closeSaveModal() { hide('save-overlay'); }
+
+async function populateFolders() {
+  const sel = document.getElementById('save-folder-sel');
+  sel.innerHTML = '<option value="">Loading...</option>';
+  const { data } = await db.from('folders').select('*').eq('user_id', currentUser.id).order('name');
+  if (!data?.length) {
+    sel.innerHTML = '<option value="__new__">No folders yet</option>';
+    toggleNewFolder(true);
+  } else {
+    sel.innerHTML = data.map(f => `<option value="${f.id}">${esc(f.name)}</option>`).join('');
+    sel.innerHTML += '<option value="__new__">+ New folder...</option>';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('save-folder-sel')?.addEventListener('change', function() {
+    if (this.value === '__new__') toggleNewFolder(true);
+  });
+});
+
+function toggleNewFolder(forceOpen) {
+  newFolderOpen = forceOpen !== undefined ? forceOpen : !newFolderOpen;
+  document.getElementById('new-folder-wrap').classList.toggle('hidden', !newFolderOpen);
+  setText('new-folder-toggle', newFolderOpen ? '- Hide' : '+ Create new folder');
+}
+
+async function doSaveNotes() {
+  const title     = val('save-title').trim();
+  const folderSel = document.getElementById('save-folder-sel').value;
+  const newName   = val('new-folder-name').trim();
+  hide('save-err');
+
+  if (!title) return showErr('save-err', 'Please give your notes a title.');
+
+  let folderId = folderSel;
+
+  if (folderSel === '__new__' || newFolderOpen) {
+    if (!newName) return showErr('save-err', 'Please enter a folder name.');
+    const { data, error } = await db.from('folders')
+      .insert({ user_id: currentUser.id, name: newName })
+      .select().single();
+    if (error) return showErr('save-err', 'Could not create folder: ' + error.message);
+    folderId = data.id;
+  }
+
+  const stickyData = getStickyNotesData();
+  const { error } = await db.from('notes').insert({
+    user_id:   currentUser.id,
+    folder_id: folderId,
+    title,
+    content:   currentHTML,
+    metadata:  { stickyNotes: stickyData }
+  });
+
+  if (error) return showErr('save-err', 'Could not save: ' + error.message);
+  closeSaveModal();
+  toast('✅ Notes saved!');
+}
+
+// ══════════════════════════════════════════════
+//  NOTES PANEL
+// ══════════════════════════════════════════════
+function openNotesPanel() {
+  document.getElementById('notes-panel').classList.add('open');
+  loadNotesList();
+}
+function closeNotesPanel() {
+  document.getElementById('notes-panel').classList.remove('open');
+}
+
+async function loadNotesList() {
+  const body = document.getElementById('panel-body');
+  body.innerHTML = '<div class="panel-empty">Loading...</div>';
+  const { data: folders, error } = await db
+    .from('folders').select('id, name, notes(id, title, created_at)')
+    .eq('user_id', currentUser.id).order('name');
+  if (error || !folders?.length) {
+    body.innerHTML = '<div class="panel-empty">No saved notes yet.<br><br>Generate some notes and tap 💾 Save!</div>';
+    return;
+  }
+  const html = folders.map(f => {
+    const notes = (f.notes || []).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+    if (!notes.length) return '';
+    return `<div class="folder-group">
+      <div class="folder-label">📁 ${esc(f.name)}</div>
+      ${notes.map(n => `
+        <div class="note-item" onclick="loadNote('${n.id}')">
+          <div class="note-info">
+            <div class="note-item-title">${esc(n.title)}</div>
+            <div class="note-item-date">${new Date(n.created_at).toLocaleDateString()}</div>
+          </div>
+          <button class="note-del" onclick="deleteNote(event,'${n.id}')" title="Delete">🗑️</button>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+  body.innerHTML = html || '<div class="panel-empty">No notes saved yet!</div>';
+}
+
+async function loadNote(id) {
+  const { data, error } = await db.from('notes').select('*').eq('id', id).single();
+  if (error || !data) return toast('Could not load note.');
+  currentHTML = data.content;
+  document.getElementById('notes-render').innerHTML = data.content;
+  // Restore sticky notes if any
+  const stickies = data.metadata?.stickyNotes || [];
+  setTimeout(() => restoreStickyNotes(stickies), 100);
+  show('output-section');
+  closeNotesPanel();
+  document.getElementById('output-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function deleteNote(e, id) {
+  e.stopPropagation();
+  if (!confirm('Delete this note? This cannot be undone.')) return;
+  await db.from('notes').delete().eq('id', id);
+  loadNotesList();
+}
+
+// ══════════════════════════════════════════════
+//  THEME
+// ══════════════════════════════════════════════
+function toggleDark() {
+  dark = !dark;
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  setText('theme-icon', dark ? '☀️' : '🌙');
+  setText('theme-lbl',  dark ? 'Light Mode' : 'Dark Mode');
+}
+
+
+
+// ══════════════════════════════════════════════
+//  FILE HANDLING
+// ══════════════════════════════════════════════
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('dragover'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
+
+function handleFile(f) {
+  selectedFile = f;
+  setText('file-name-lbl', '📎 ' + f.name);
+  document.getElementById('file-preview').classList.remove('hidden');
+  document.getElementById('file-preview').classList.add('visible');
+  document.getElementById('paste-input').value = '';
+}
+function clearFile() {
+  selectedFile = null; fileInput.value = '';
+  document.getElementById('file-preview').classList.add('hidden');
+  document.getElementById('file-preview').classList.remove('visible');
+}
+
+async function extractText() {
+  if (selectedFile) {
+    const ext = selectedFile.name.split('.').pop().toLowerCase();
+    if (ext === 'txt')  return await selectedFile.text();
+    if (ext === 'docx') {
+      const ab = await selectedFile.arrayBuffer();
+      const result = await mammoth.extractRawText({arrayBuffer: ab});
+      return { type: 'text', content: result.value };
+    }
+    if (ext === 'pdf') {
+      const b64 = await readB64(selectedFile);
+      return { type: 'pdf', content: b64 };
+    }
+    if (['jpg','jpeg','png','webp','gif'].includes(ext)) {
+      const b64 = await readB64(selectedFile);
+      const mimeMap = { jpg:'image/jpeg', jpeg:'image/jpeg', png:'image/png', webp:'image/webp', gif:'image/gif' };
+      return { type: 'image', content: b64.split(',')[1], mime: mimeMap[ext] || 'image/jpeg' };
+    }
+    throw new Error('Unsupported file type. Please use PDF, .docx, .txt, or an image file.');
+  }
+  // Check URL input
+  const urlVal = document.getElementById('url-input') ? document.getElementById('url-input').value.trim() : '';
+  if (urlVal && urlVal.startsWith('http')) {
+    let resp, data;
+    try {
+      resp = await fetch('/api/fetch-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: urlVal })
+      });
+    } catch(e) {
+      throw new Error('Could not connect to the page fetcher. Please paste the text instead.');
+    }
+    const rawText = await resp.text();
+    try { data = JSON.parse(rawText); } catch(e) {
+      throw new Error('This website is blocking outside access. Try copying and pasting the text instead.');
+    }
+    if (!resp.ok || data.error) throw new Error(data.error || 'Could not fetch that URL. Try pasting the text instead.');
+    if (!data.text) throw new Error('Could not extract text from that page. Try copying and pasting instead.');
+    return { type: 'url', content: data.text, images: data.images || [], sourceUrl: data.sourceUrl };
+  }
+  const p = document.getElementById('paste-input').value.trim();
+  if (p) return { type: 'text', content: p };
+  throw new Error('Please upload a file, enter a URL, or paste some text first.');
+}
+
+function readB64(file) {
+  return new Promise((res,rej) => { const r = new FileReader(); r.onload=()=>res(r.result); r.onerror=()=>rej(new Error('Could not read file')); r.readAsDataURL(file); });
+}
+
+// ══════════════════════════════════════════════
+//  CLAUDE API
+// ══════════════════════════════════════════════
+
+// ══════════════════════════════════════════════
+//  CLAUDE API -- calls our secure Netlify function
+// ══════════════════════════════════════════════
+async function callClaude(payload) {
+  let resp;
+  try {
+    resp = await fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch(e) {
+    throw new Error('Could not connect to the notes generator. Check your internet and try again.');
+  }
+  const rawText = await resp.text();
+  let data;
+  try { data = JSON.parse(rawText); } catch(e) {
+    if (resp.status === 504) throw new Error('The request took too long. Try pasting just one section of text at a time.');
+    throw new Error('Something went wrong. Please try again.');
+  }
+  if (!resp.ok) {
+    if (resp.status === 401) throw new Error('API key error. Please contact the site owner.');
+    if (resp.status === 429) throw new Error('Too many requests. Wait 30 seconds and try again.');
+    if (resp.status === 504) throw new Error('The request took too long. Try pasting just one section of text at a time.');
+    throw new Error(data?.error || data?.error?.message || 'Something went wrong. Please try again.');
+  }
+  return data.content.filter(b => b.type==='text').map(b => b.text).join('').trim();
+}
+
+
+// ══════════════════════════════════════════════
+//  GENERATE NOTES
+// ══════════════════════════════════════════════
+async function generateNotes() {
+  hide('gen-err');
+  let extracted;
+  try { extracted = await extractText(); } catch(e) { showErr('gen-err', e.message); return; }
+
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = true;
+
+  show('loading-box');
+  document.getElementById('upload-section').style.opacity = '.5';
+  document.getElementById('upload-section').style.pointerEvents = 'none';
+
+  try {
+    let messages;
+    const basePrompt = 'Convert this study material into ADHD-friendly notes. If you find references to images, diagrams or charts, describe what they likely show based on context and include a visual description box:';
+
+    if (extracted.type === 'pdf') {
+      const b64 = extracted.content.split(',')[1] || extracted.content;
+      if (b64.length < 100) throw new Error('Could not read PDF. Try pasting the text instead.');
+      messages = [{role:'user',content:[{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},{type:'text',text:basePrompt}]}];
+    } else if (extracted.type === 'image') {
+      messages = [{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:extracted.mime,data:extracted.content}},
+        {type:'text',text:'This is a study image, diagram, or chart. Convert it into ADHD-friendly notes. Describe what the image shows in detail, including any labels, arrows, processes, or relationships shown. Include a visual description box in the notes.'}
+      ]}];
+    } else if (extracted.type === 'url' && extracted.images && extracted.images.length > 0) {
+      // Build content array with text + images from the page
+      const contentParts = [{type:'text',text:basePrompt + '\n\nPage text:\n' + extracted.content + '\n\nThis page also contains images. After your notes, include a section called "Visual References" that links back to each image and describes what it shows based on context. Use this format for each image: <div class="n-box blue"><div class="n-box-label">🖼 Visual Reference</div><p>[Description of what this image/diagram shows]</p><a href="IMAGE_URL" target="_blank" rel="noopener">View original image</a></div>'}];
+      // Add up to 3 images for Claude to actually see
+      for (let i = 0; i < Math.min(extracted.images.length, 3); i++) {
+        const img = extracted.images[i];
+        contentParts.push({type:'text',text:'Image ' + (i+1) + ' (alt: ' + img.alt + ', url: ' + img.src + '):'});
+      }
+      messages = [{role:'user',content:contentParts}];
+    } else {
+      messages = [{role:'user',content:basePrompt + '\n\n' + (extracted.content || extracted)}];
+    }
+
+    const activePrompt = currentMode === 'dyslexic' ? DYSLEXIA_PROMPT : SYSTEM_PROMPT;
+    let html = await callClaude({ model:'claude-sonnet-4-20250514', max_tokens:6000, system:activePrompt, messages });
+    const fence = html.match(/```(?:html)?\s*([\s\S]*?)```/i);
+    if (fence) html = fence[1].trim();
+    if (!html.includes('<')) html = `<h1>📋 Your Notes</h1><div class="n-section"><div class="n-chunk"><p>${html.replace(/\n/g,'<br>')}</p></div></div>`;
+
+    currentHTML = html;
+    document.getElementById('notes-render').innerHTML = html;
+    // Clear any existing sticky notes for fresh generation
+    restoreStickyNotes([]);
+    show('output-section');
+    if (currentUser) show('save-btn');
+    document.getElementById('output-section').scrollIntoView({ behavior:'smooth', block:'start' });
+
+  } catch(e) {
+    showErr('gen-err', e.message);
+    document.getElementById('upload-section').style.opacity = '1';
+    document.getElementById('upload-section').style.pointerEvents = 'auto';
+  } finally {
+    btn.disabled = false;
+    hide('loading-box');
+  }
+}
+
+const SYSTEM_PROMPT = `You are an expert at converting study material into ADHD-friendly notes. Return ONLY valid HTML using these exact CSS classes -- no markdown, no explanations.
+RULES:
+- Break into 3-7 short sections with emoji titles.
+- Use .n-chunk for plain-English summaries. Short sentences. One idea per line.
+- Use .n-box with colors: blue=facts/definitions, green=steps/processes, yellow=write this down, pink=warnings/catches, purple=vocab, orange=examples.
+- Bold key words with <strong>. Use <span class="n-highlight"> for key terms.
+- Add .n-pause between every section.
+- End with a .n-vocab key terms recap.
+- IMAGES AND DIAGRAMS: When you see or detect a diagram, chart, image, or visual (from a PDF, image file, or URL), always add a pink visual description box describing what it shows in plain English. Use this format: <div class="n-box pink"><div class="n-box-label">🖼 Visual: What This Shows</div><p>Plain English description of the diagram/chart/image</p></div>. If you have a URL for the image, add a link: <a href="URL" target="_blank" rel="noopener" style="color:var(--accent);font-weight:700;">View original image</a>
+STRUCTURE: <h1>Title</h1><p class="subtitle">subtitle</p> then sections: <div class="n-section"><div class="n-section-title"><span>emoji</span> Title <span class="n-badge">Big Idea</span></div><div class="n-chunk"><p>text</p></div><div class="n-box blue"><div class="n-box-label">📘 Label</div>content</div><ul class="n-list"><li>item</li></ul></div><span class="n-pause">✅ Pause -- Got it? Move on when ready.</span> -- end with: <div class="n-section"><div class="n-section-title"><span>🔑</span> Key Terms</div><div class="n-vocab"><div class="n-vocab-item"><span class="n-vocab-term">Term</span> -- definition</div></div></div>
+Return ONLY the HTML.`;
+
+const DYSLEXIA_PROMPT = `You are an expert at converting study material into dyslexia-friendly notes. Return ONLY valid HTML using these exact CSS classes -- no markdown, no explanations.
+RULES:
+- Break into 3-7 short sections with emoji titles.
+- Use VERY short sentences -- maximum 10 words each. One idea per line. No long paragraphs.
+- Use simple, common words. Avoid jargon. If a technical word is needed, immediately define it in plain English.
+- NEVER use italics or ALL CAPS for emphasis. Use <strong> for bold instead.
+- Use .n-chunk for plain-English summaries.
+- Use .n-box with colors: blue=facts/definitions, green=steps/processes, yellow=write this down, pink=warnings/catches, purple=vocab, orange=examples.
+- Add .n-pause between every section.
+- End with a .n-vocab key terms recap with very simple definitions.
+- IMAGES AND DIAGRAMS: When you see or detect a diagram, chart, image, or visual, always add a pink visual description box. Describe it in very simple short sentences. Use this format: <div class="n-box pink"><div class="n-box-label">🖼 Visual: What This Shows</div><p>Simple description here.</p></div>
+- Use numbered lists instead of bullet points where possible.
+STRUCTURE: <h1>Title</h1><p class="subtitle">subtitle</p> then sections: <div class="n-section"><div class="n-section-title"><span>emoji</span> Title <span class="n-badge">Big Idea</span></div><div class="n-chunk"><p>text with <strong>bold key words</strong></p></div><div class="n-box blue"><div class="n-box-label">📘 Label</div>content</div><ol class="n-list"><li>item</li></ol></div><span class="n-pause">✅ Pause -- Got it? Move on when ready.</span> -- end with: <div class="n-section"><div class="n-section-title"><span>🔑</span> Key Terms</div><div class="n-vocab"><div class="n-vocab-item"><span class="n-vocab-term">Term</span> -- simple definition</div></div></div>
+Return ONLY the HTML.`;
+
+// ══════════════════════════════════════════════
+//  MODE TOGGLE
+// ══════════════════════════════════════════════
+let currentMode = 'adhd';
+
+function setMode(mode) {
+  currentMode = mode;
+  document.documentElement.setAttribute('data-mode', mode);
+  document.getElementById('mode-adhd').classList.toggle('active', mode === 'adhd');
+  document.getElementById('mode-dyslexic').classList.toggle('active', mode === 'dyslexic');
+  // Update page title hint
+  const sub = document.querySelector('.upload-section .section-label');
+  if (sub) sub.textContent = mode === 'dyslexic' ? '📂 Step 1 -- Add Your Content (Dyslexia Mode 📖)' : '📂 Step 1 -- Add Your Content';
+}
+
+
+// ══════════════════════════════════════════════
+//  STICKY NOTES
+// ══════════════════════════════════════════════
+let stickyNotes = []; // { id, text, color, ref, x, y, minimized }
+let stickyColor = '#ffe168';
+let activeStickyRef = '';
+let dragState = null;
+
+function openStickyModal() {
+  document.getElementById('sticky-modal').classList.remove('hidden');
+  document.getElementById('sticky-modal-ref').textContent = '"' + (selectedText.length > 80 ? selectedText.substring(0,80)+'...' : selectedText) + '"';
+  document.getElementById('sticky-modal-text').value = '';
+  activeStickyRef = selectedText;
+  stickyColor = '#ffe168';
+  // Reset color selection
+  document.querySelectorAll('.sticky-modal-color-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelector('.sticky-modal-color-btn[data-color="#ffe168"]').classList.add('selected');
+  document.getElementById('sticky-modal-text').focus();
+  // Hide tooltip
+  document.getElementById('explain-tooltip').classList.remove('visible');
+}
+
+function closeStickyModal() {
+  document.getElementById('sticky-modal').classList.add('hidden');
+}
+
+function selectStickyColor(btn) {
+  document.querySelectorAll('.sticky-modal-color-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  stickyColor = btn.dataset.color;
+}
+
+function saveStickyNote() {
+  const text = document.getElementById('sticky-modal-text').value.trim();
+  if (!text) return;
+  const note = {
+    id: 'sticky-' + Date.now(),
+    text,
+    color: stickyColor,
+    ref: activeStickyRef,
+    x: 20,
+    y: 20 + (stickyNotes.length * 20),
+    minimized: false
+  };
+  stickyNotes.push(note);
+  renderStickyNote(note);
+  closeStickyModal();
+}
+
+function renderStickyNote(note) {
+  const container = document.getElementById('notes-render');
+  if (!container) return;
+
+  const el = document.createElement('div');
+  el.className = 'sticky-note' + (note.minimized ? ' minimized' : '');
+  el.id = note.id;
+  el.style.cssText = `background:${note.color};left:${note.x}px;top:${note.y}px;position:fixed;`;
+
+  const refShort = note.ref.length > 40 ? note.ref.substring(0,40)+'...' : note.ref;
+  const textShort = note.text.length > 30 ? note.text.substring(0,30)+'...' : note.text;
+
+  el.innerHTML = `
+    <div class="sticky-header">
+      <span class="sticky-handle">${note.minimized ? textShort : '📝 My Note'}</span>
+      <div class="sticky-actions">
+        <button class="sticky-btn" onclick="toggleStickyMinimize('${note.id}')" title="${note.minimized ? 'Expand' : 'Minimize'}">${note.minimized ? '▼' : '▲'}</button>
+        <button class="sticky-btn" onclick="deleteStickyNote('${note.id}')" title="Delete">✕</button>
+      </div>
+    </div>
+    <div class="sticky-body">
+      <textarea class="sticky-textarea" placeholder="Type your note..." onmousedown="event.stopPropagation()">${note.text}</textarea>
+      <div class="sticky-colors">
+        ${['#ffe168','#c8f5d0','#c8e8ff','#ffd6e7','#e8d6ff','#ffe3c8'].map(c =>
+          `<div class="sticky-color-btn${note.color===c?' selected':''}" style="background:${c}" data-color="${c}" onclick="changeStickyColor('${note.id}','${c}',this)"></div>`
+        ).join('')}
+      </div>
+      <div class="sticky-ref">"${refShort}"</div>
+    </div>
+  `;
+
+  // Save text changes
+  const ta = el.querySelector('.sticky-textarea');
+  ta.addEventListener('input', () => {
+    const n = stickyNotes.find(s => s.id === note.id);
+    if (n) n.text = ta.value;
+  });
+
+  // Drag support
+  el.querySelector('.sticky-header').addEventListener('mousedown', startDrag);
+  el.querySelector('.sticky-header').addEventListener('touchstart', startDragTouch, {passive:true});
+
+  container.appendChild(el);
+}
+
+function toggleStickyMinimize(id) {
+  const note = stickyNotes.find(s => s.id === id);
+  if (!note) return;
+  note.minimized = !note.minimized;
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('minimized', note.minimized);
+  const btn = el.querySelector('.sticky-btn');
+  const handle = el.querySelector('.sticky-handle');
+  btn.textContent = note.minimized ? '▼' : '▲';
+  btn.title = note.minimized ? 'Expand' : 'Minimize';
+  handle.textContent = note.minimized ? (note.text.length > 30 ? note.text.substring(0,30)+'...' : note.text) : '📝 My Note';
+}
+
+function deleteStickyNote(id) {
+  stickyNotes = stickyNotes.filter(s => s.id !== id);
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+function changeStickyColor(id, color, btn) {
+  const note = stickyNotes.find(s => s.id === id);
+  if (!note) return;
+  note.color = color;
+  const el = document.getElementById(id);
+  if (el) {
+    el.style.background = color;
+    el.querySelectorAll('.sticky-color-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  }
+}
+
+// ── Drag ──
+function startDrag(e) {
+  if (e.target.closest('.sticky-btn') || e.target.closest('.sticky-textarea') || e.target.closest('.sticky-color-btn')) return;
+  const el = e.currentTarget.closest('.sticky-note');
+  const rect = el.getBoundingClientRect();
+  dragState = {
+    el,
+    offsetX: e.clientX - rect.left,
+    offsetY: e.clientY - rect.top
+  };
+  el.style.zIndex = 600;
+  e.preventDefault();
+}
+
+function startDragTouch(e) {
+  if (e.target.closest('.sticky-btn') || e.target.closest('.sticky-textarea') || e.target.closest('.sticky-color-btn')) return;
+  const touch = e.touches[0];
+  const el = e.currentTarget.closest('.sticky-note');
+  const rect = el.getBoundingClientRect();
+  dragState = {
+    el,
+    offsetX: touch.clientX - rect.left,
+    offsetY: touch.clientY - rect.top
+  };
+  el.style.zIndex = 600;
+}
+
+document.addEventListener('mousemove', e => {
+  if (!dragState) return;
+  const { el, offsetX, offsetY } = dragState;
+  let x = e.clientX - offsetX;
+  let y = e.clientY - offsetY;
+  // Allow anywhere on screen, just keep slightly visible
+  x = Math.max(-180, Math.min(x, window.innerWidth - 40));
+  y = Math.max(0, Math.min(y, window.innerHeight - 40));
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  const note = stickyNotes.find(s => s.id === el.id);
+  if (note) { note.x = x; note.y = y; }
+});
+
+document.addEventListener('touchmove', e => {
+  if (!dragState) return;
+  const touch = e.touches[0];
+  const { el, offsetX, offsetY } = dragState;
+  let x = touch.clientX - offsetX;
+  let y = touch.clientY - offsetY;
+  x = Math.max(-180, Math.min(x, window.innerWidth - 40));
+  y = Math.max(0, Math.min(y, window.innerHeight - 40));
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  const note = stickyNotes.find(s => s.id === el.id);
+  if (note) { note.x = x; note.y = y; }
+}, {passive:true});
+
+document.addEventListener('mouseup', () => {
+  if (dragState) { dragState.el.style.zIndex = 500; dragState = null; }
+});
+document.addEventListener('touchend', () => {
+  if (dragState) { dragState.el.style.zIndex = 500; dragState = null; }
+});
+
+// ── Include sticky notes when saving ──
+function getStickyNotesData() {
+  return stickyNotes.map(n => {
+    const el = document.getElementById(n.id);
+    const ta = el ? el.querySelector('.sticky-textarea') : null;
+    return { ...n, text: ta ? ta.value : n.text };
+  });
+}
+
+// ── Restore sticky notes when loading saved notes ──
+function restoreStickyNotes(notes) {
+  // Clear existing
+  stickyNotes.forEach(n => { const el = document.getElementById(n.id); if (el) el.remove(); });
+  stickyNotes = [];
+  if (!notes || !notes.length) return;
+  notes.forEach(n => {
+    stickyNotes.push(n);
+    renderStickyNote(n);
+  });
+}
+
+// Close sticky modal on overlay click
+document.getElementById('sticky-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeStickyModal();
+});
+
+// ══════════════════════════════════════════════
+//  HIGHLIGHT → EXPLAIN
+// ══════════════════════════════════════════════
+const tooltip  = document.getElementById('explain-tooltip');
+const expPanel = document.getElementById('explain-panel');
+
+document.addEventListener('mouseup', onSel);
+document.addEventListener('touchend', onSel);
+document.addEventListener('mousedown', e => { if (!tooltip.contains(e.target)) tooltip.classList.remove('visible'); });
+
+function onSel(e) {
+  if (tooltip.contains(e.target) || expPanel.contains(e.target)) return;
+  setTimeout(() => {
+    const sel  = window.getSelection();
+    const text = sel ? sel.toString().trim() : '';
+    const nr   = document.getElementById('notes-render');
+    if (!nr || !text || text.length < 2) { tooltip.classList.remove('visible'); return; }
+    let node = sel.anchorNode, inside = false;
+    while (node) { if (node === nr) { inside = true; break; } node = node.parentNode; }
+    if (!inside) { tooltip.classList.remove('visible'); return; }
+    selectedText = text;
+    document.getElementById('explain-sel-preview').textContent = '"' + (text.length > 60 ? text.substring(0,60)+'...' : text) + '"';
+    const rect = sel.getRangeAt(0).getBoundingClientRect();
+    const W = 280;
+    let left = rect.left + rect.width/2 - W/2;
+    let top  = rect.top - 10;
+    left = Math.max(8, Math.min(left, window.innerWidth - W - 8));
+    if (top < 60) top = rect.bottom + 10;
+    tooltip.style.cssText = `left:${left}px;top:${top}px;width:${W}px;`;
+    tooltip.classList.add('visible');
+  }, 10);
+}
+
+async function openExplainPanel() {
+  if (!selectedText) return;
+  tooltip.classList.remove('visible');
+  document.getElementById('explain-q').textContent = '"' + (selectedText.length > 80 ? selectedText.substring(0,80)+'...' : selectedText) + '"';
+  document.getElementById('explain-body').innerHTML = '<div class="explain-spin-wrap"><div class="explain-spinner"></div> Explaining this for you...</div>';
+  show('explain-panel');
+  window.scrollBy({ top: 120, behavior: 'smooth' });
+  try {
+    const result = await callClaude({
+      model: 'claude-sonnet-4-20250514', max_tokens: 600,
+      system: `You are a patient tutor helping someone with ADHD. Explain in plain English, 3-5 sentences max. Use a real-life analogy if helpful. Return only simple HTML with <strong> for key words and ONE colored box: <div class="e-box yellow">✏️ <strong>Remember:</strong> ...</div> OR <div class="e-box blue">📘 <strong>In plain English:</strong> ...</div> OR <div class="e-box green">📗 <strong>Real life example:</strong> ...</div>. No markdown.`,
+      messages: [{ role: 'user', content: `Explain this from my study notes: "${selectedText}"` }]
+    });
+    document.getElementById('explain-body').innerHTML = result;
+  } catch(e) {
+    document.getElementById('explain-body').innerHTML = `<div class="e-box yellow">⚠️ ${e.message}</div>`;
+  }
+}
+
+function closeExplainPanel() { hide('explain-panel'); selectedText = ''; }
+
+// ══════════════════════════════════════════════
+//  ACTIONS
+// ══════════════════════════════════════════════
+function resetApp() {
+  hide('output-section');
+  document.getElementById('upload-section').style.cssText = '';
+  document.getElementById('paste-input').value = '';
+  hide('gen-err');
+  document.getElementById('notes-render').innerHTML = '';
+  hide('save-btn');
+  currentHTML = '';
+  clearFile();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function downloadNotes() {
+  const c = document.getElementById('notes-render').innerHTML;
+  const h = `<!DOCTYPE html><html data-theme="${dark?'dark':'light'}"><head><meta charset="UTF-8"><title>Brain-Friendly Notes</title><link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Architects+Daughter&display=swap" rel="stylesheet"><style>:root{--bg:#fdf6ec;--bg2:#fef9f2;--card:#fff;--border:#e8ddd0;--text:#2a2010;--muted:#8a7a60;--accent:#f5a623;--yellow:#ffe168;--yellow-bg:#fffbe6;--green:#c8f5d0;--green-bg:#f0fff4;--blue:#c8e8ff;--blue-bg:#f0f8ff;--pink:#ffd6e7;--pink-bg:#fff5f8;--purple:#e8d6ff;--purple-bg:#faf5ff;--orange:#ffe3c8;--orange-bg:#fff8f2;--shadow-sm:2px 2px 0 #e0d0b8;}[data-theme=dark]{--bg:#1a1610;--bg2:#201c14;--card:#2a2418;--border:#3a3020;--text:#f0e8d8;--muted:#a09070;--yellow:#a07800;--yellow-bg:#2a2400;--green:#0a5020;--green-bg:#0a1e10;--blue:#083060;--blue-bg:#080e1e;--pink:#60182a;--pink-bg:#1e0810;--purple:#381860;--purple-bg:#100818;--orange:#602008;--orange-bg:#1e0c04;}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);padding:32px 20px 60px;max-width:780px;margin:0 auto;line-height:1.7}h1{font-family:'Architects Daughter',cursive;font-size:1.8rem;text-align:center;margin-bottom:4px}.subtitle{text-align:center;color:var(--muted);font-size:.88rem;margin-bottom:28px}.n-section{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:20px;box-shadow:var(--shadow-sm)}.n-section-title{font-size:1.05rem;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.n-badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.72rem;font-weight:700;text-transform:uppercase;background:var(--yellow);color:#6a4400}.n-chunk{border-left:4px solid var(--accent);background:var(--yellow-bg);padding:10px 14px;border-radius:0 10px 10px 0;margin-bottom:12px;font-size:.95rem;line-height:1.65}.n-box{border-radius:10px;padding:12px 14px;margin-top:10px;font-size:.91rem;line-height:1.6}.n-box-label{font-weight:800;font-size:.78rem;text-transform:uppercase;margin-bottom:5px}.n-box.yellow{background:var(--yellow-bg);border:1.5px dashed var(--accent)}.n-box.green{background:var(--green-bg);border:1.5px dashed #4caf7d}.n-box.blue{background:var(--blue-bg);border:1.5px dashed #4a90c4}.n-box.pink{background:var(--pink-bg);border:1.5px dashed #d46895}.n-box.purple{background:var(--purple-bg);border:1.5px dashed #9b6dd6}.n-box.orange{background:var(--orange-bg);border:1.5px dashed #d48a3a}.n-highlight{background:var(--yellow);padding:1px 4px;border-radius:4px;font-weight:700;color:#5a3a00}.n-list{list-style:none;padding:0;margin-top:6px}.n-list li{padding:5px 0 5px 20px;position:relative;font-size:.93rem}.n-list li::before{content:"→";position:absolute;left:0;color:var(--accent);font-weight:700}.n-pause{text-align:center;font-family:'Architects Daughter',cursive;font-size:.82rem;color:#6a4400;background:var(--yellow);display:block;width:fit-content;margin:6px auto 18px;padding:4px 16px;border-radius:20px}.n-vocab{display:flex;flex-direction:column;gap:9px}.n-vocab-item{background:var(--purple-bg);border:1.5px solid var(--purple);border-radius:10px;padding:9px 13px;font-size:.91rem}.n-vocab-term{font-weight:800;color:#6a2ab5;font-size:.97rem}</style></head><body>${c}</body></html>`;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([h], {type:'text/html'}));
+  a.download = 'brain-friendly-notes.html';
+  a.click();
+}
+
+// ══════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════
+function show(id) { document.getElementById(id)?.classList.remove('hidden'); }
+function hide(id) { document.getElementById(id)?.classList.add('hidden'); }
+function val(id)  { return document.getElementById(id)?.value || ''; }
+function setText(id, t) { const el = document.getElementById(id); if (el) el.textContent = t; }
+function esc(s)   { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = '⚠️ ' + msg;
+  el.classList.remove('hidden');
+}
+function showOk(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+function toast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// Enter key support
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('auth-pass')?.addEventListener('keydown', e => { if (e.key==='Enter') doAuth(); });
+  document.getElementById('forgot-email')?.addEventListener('keydown', e => { if (e.key==='Enter') doForgot(); });
+  document.getElementById('save-folder-sel')?.addEventListener('change', function() {
+    if (this.value === '__new__') toggleNewFolder(true);
+  });
+});
+</script>
+</body>
+</html>
