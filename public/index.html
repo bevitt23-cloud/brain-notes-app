@@ -234,7 +234,7 @@ textarea::placeholder{color:var(--muted);}
 
 /* ── STICKY NOTES ── */
 .sticky-note {
-  position:absolute;
+  position:fixed;
   width:220px;
   min-height:120px;
   border-radius:12px;
@@ -824,14 +824,21 @@ async function extractText() {
   // Check URL input
   const urlVal = document.getElementById('url-input') ? document.getElementById('url-input').value.trim() : '';
   if (urlVal && urlVal.startsWith('http')) {
-    const resp = await fetch('/.netlify/functions/fetch-url', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: urlVal })
-    });
-    let data;
-    try { data = await resp.json(); } catch(e) { throw new Error('Could not reach the page fetcher. Please paste text instead.'); }
-    if (!resp.ok) throw new Error(data.error || 'Could not fetch that URL. Try pasting the text instead.');
+    let resp, data;
+    try {
+      resp = await fetch('/.netlify/functions/fetch-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: urlVal })
+      });
+    } catch(e) {
+      throw new Error('Could not connect to the page fetcher. Please paste the text instead.');
+    }
+    const rawText = await resp.text();
+    try { data = JSON.parse(rawText); } catch(e) {
+      throw new Error('This website is blocking outside access. Try copying and pasting the text instead.');
+    }
+    if (!resp.ok || data.error) throw new Error(data.error || 'Could not fetch that URL. Try pasting the text instead.');
     if (!data.text) throw new Error('Could not extract text from that page. Try copying and pasting instead.');
     return { type: 'url', content: data.text, images: data.images || [], sourceUrl: data.sourceUrl };
   }
@@ -1031,7 +1038,7 @@ function renderStickyNote(note) {
   const el = document.createElement('div');
   el.className = 'sticky-note' + (note.minimized ? ' minimized' : '');
   el.id = note.id;
-  el.style.cssText = `background:${note.color};left:${note.x}px;top:${note.y}px;`;
+  el.style.cssText = `background:${note.color};left:${note.x}px;top:${note.y}px;position:fixed;`;
 
   const refShort = note.ref.length > 40 ? note.ref.substring(0,40)+'...' : note.ref;
   const textShort = note.text.length > 30 ? note.text.substring(0,30)+'...' : note.text;
@@ -1106,12 +1113,10 @@ function startDrag(e) {
   if (e.target.closest('.sticky-btn') || e.target.closest('.sticky-textarea') || e.target.closest('.sticky-color-btn')) return;
   const el = e.currentTarget.closest('.sticky-note');
   const rect = el.getBoundingClientRect();
-  const containerRect = el.parentElement.getBoundingClientRect();
   dragState = {
     el,
     offsetX: e.clientX - rect.left,
-    offsetY: e.clientY - rect.top,
-    containerRect
+    offsetY: e.clientY - rect.top
   };
   el.style.zIndex = 600;
   e.preventDefault();
@@ -1125,19 +1130,19 @@ function startDragTouch(e) {
   dragState = {
     el,
     offsetX: touch.clientX - rect.left,
-    offsetY: touch.clientY - rect.top,
-    containerRect: el.parentElement.getBoundingClientRect()
+    offsetY: touch.clientY - rect.top
   };
   el.style.zIndex = 600;
 }
 
 document.addEventListener('mousemove', e => {
   if (!dragState) return;
-  const { el, offsetX, offsetY, containerRect } = dragState;
-  let x = e.clientX - offsetX - containerRect.left;
-  let y = e.clientY - offsetY - containerRect.top;
-  x = Math.max(0, x);
-  y = Math.max(0, y);
+  const { el, offsetX, offsetY } = dragState;
+  let x = e.clientX - offsetX;
+  let y = e.clientY - offsetY;
+  // Allow anywhere on screen, just keep slightly visible
+  x = Math.max(-180, Math.min(x, window.innerWidth - 40));
+  y = Math.max(0, Math.min(y, window.innerHeight - 40));
   el.style.left = x + 'px';
   el.style.top = y + 'px';
   const note = stickyNotes.find(s => s.id === el.id);
@@ -1147,11 +1152,11 @@ document.addEventListener('mousemove', e => {
 document.addEventListener('touchmove', e => {
   if (!dragState) return;
   const touch = e.touches[0];
-  const { el, offsetX, offsetY, containerRect } = dragState;
-  let x = touch.clientX - offsetX - containerRect.left;
-  let y = touch.clientY - offsetY - containerRect.top;
-  x = Math.max(0, x);
-  y = Math.max(0, y);
+  const { el, offsetX, offsetY } = dragState;
+  let x = touch.clientX - offsetX;
+  let y = touch.clientY - offsetY;
+  x = Math.max(-180, Math.min(x, window.innerWidth - 40));
+  y = Math.max(0, Math.min(y, window.innerHeight - 40));
   el.style.left = x + 'px';
   el.style.top = y + 'px';
   const note = stickyNotes.find(s => s.id === el.id);
