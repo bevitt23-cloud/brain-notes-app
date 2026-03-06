@@ -240,6 +240,14 @@ textarea::placeholder{color:var(--muted);}
 
 @media print{.topbar,.upload-section,.output-topbar,#explain-tooltip,#explain-panel,#notes-panel,.overlay,.funding-banner,.site-footer{display:none!important;}body{background:#fff;}#notes-render{border:none;box-shadow:none;padding:0;background:#fff;}}
 @media(max-width:540px){.topbar{padding:12px 14px;}.logo{font-size:1.1rem;}.main{padding:20px 12px 40px;}#notes-render{padding:16px 14px;}#notes-panel{width:100%;right:-100%;}}
+
+/* ── SITE NAV TABS ── */
+.site-nav{background:var(--card);border-bottom:2px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none;}
+.site-nav::-webkit-scrollbar{display:none;}
+.site-nav-tab{display:inline-flex;align-items:center;gap:7px;padding:13px 18px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:.86rem;color:var(--muted);text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;background:none;border-left:none;border-right:none;border-top:none;cursor:pointer;margin-bottom:-2px;}
+.site-nav-tab:hover{color:var(--accent);}
+.site-nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:700;}
+
 </style>
 </head>
 <body>
@@ -301,6 +309,14 @@ textarea::placeholder{color:var(--muted);}
 <!-- ══ TOPBAR ══ -->
 <div class="topbar">
   <div class="logo">🧠 Brain-Friendly Notes</div>
+
+<!-- ══ SITE NAV ══ -->
+<nav class="site-nav">
+  <a href="/index.html" class="site-nav-tab active">🧠 App</a>
+  <a href="/about.html" class="site-nav-tab">ℹ️ About</a>
+  <a href="/funding.html" class="site-nav-tab">☕ Support</a>
+  <a href="/privacy-policy.html" class="site-nav-tab">🔒 Privacy & Contact</a>
+</nav>
   <div class="mode-toggle-wrap">
     <button class="mode-btn active" id="mode-adhd" onclick="setMode('adhd')">🧠 ADHD</button>
     <button class="mode-btn" id="mode-dyslexic" onclick="setMode('dyslexic')">📖 Dyslexia</button>
@@ -421,10 +437,10 @@ textarea::placeholder{color:var(--muted);}
   <span style="color:var(--border)">|</span>
   <a href="/privacy-policy.html" class="footer-link">🔒 Privacy Policy</a>
   <span style="color:var(--border)">|</span>
-  <a href="mailto:adhdnotemodifier@gmail.com" class="footer-link">📬 Contact</a>
+  <a href="/cdn-cgi/l/email-protection#f796939f93999883929a98939e919e9285b7909a969e9bd994989a" class="footer-link">📬 Contact</a>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 const SB_URL = 'https://epagtlrtzwdvferumowx.supabase.co';
 const SB_KEY = 'sb_publishable_JLHb8iewqq_RbrmZc5dmHg_KmNRSRra';
 const db = window.supabase.createClient(SB_URL, SB_KEY);
@@ -785,8 +801,4 @@ function toast(msg){const t=document.createElement('div');t.className='toast';t.
 document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('auth-pass')?.addEventListener('keydown',e=>{if(e.key==='Enter')doAuth();});
   document.getElementById('forgot-email')?.addEventListener('keydown',e=>{if(e.key==='Enter')doForgot();});
-  document.getElementById('save-folder-sel')?.addEventListener('change',function(){if(this.value==='__new__')toggleNewFolder(true);});
-});
-</script>
-</body>
-</html>
+  docume

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — ADHD Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1104878144109940" crossorigin="anonymous"></script>
+<style>
+:root {
+  --bg:#faf7f2;--bg2:#f2ede4;--card:#ffffff;--border:#e8e0d0;
+  --text:#1e1a14;--text2:#3a3228;--muted:#7a6e5e;
+  --accent:#e8920a;--accent2:#c97a08;--accent-bg:#fff8ec;--accent-light:#fde8c0;
+  --green:#2d7a4f;--green-bg:#eef7f2;--green-border:#b8dfc8;
+  --blue:#1a6090;--blue-bg:#eef5fb;--blue-border:#b8d4e8;
+  --shadow-sm:0 1px 4px rgba(0,0,0,.06);
+  --shadow:0 4px 20px rgba(0,0,0,.08);
+  --radius:18px;--radius-sm:10px;
+}
+[data-theme="dark"] {
+  --bg:#18140e;--bg2:#221c14;--card:#2a2218;--border:#3a3020;
+  --text:#f0e8d8;--text2:#d8ccb8;--muted:#9a8e7e;
+  --accent:#f5a623;--accent2:#e8913a;--accent-bg:#2a1e08;--accent-light:#3a2808;
+  --green-bg:#0e2018;--green-border:#1a4028;
+  --blue-bg:#0e1820;--blue-border:#1a3040;
+  --shadow-sm:0 1px 4px rgba(0,0,0,.3);
+  --shadow:0 4px 20px rgba(0,0,0,.35);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;transition:background .3s,color .3s;}
+
+/* TOPBAR */
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
+.logo{font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--accent);display:flex;align-items:center;gap:10px;text-decoration:none;}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.nav-btn{background:transparent;border:1.5px solid var(--border);border-radius:50px;padding:7px 18px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:.83rem;color:var(--muted);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .2s;}
+.nav-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg);}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+.fade-up{animation:fadeUp .5s ease both;}
+.d1{animation-delay:.05s;}.d2{animation-delay:.12s;}.d3{animation-delay:.19s;}
+
+/* MAIN */
+.main{max-width:720px;margin:0 auto;padding:56px 24px 100px;}
+
+/* HEADER */
+.page-header{margin-bottom:44px;}
+.page-eyebrow{display:inline-block;background:var(--accent-light);color:var(--accent2);font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 14px;border-radius:50px;margin-bottom:18px;}
+.page-title{font-family:'DM Serif Display',serif;font-size:clamp(1.8rem,5vw,2.6rem);color:var(--text);margin-bottom:10px;letter-spacing:-.02em;line-height:1.15;}
+.page-meta{font-size:.84rem;color:var(--muted);}
+.page-meta a{color:var(--accent);font-weight:600;text-decoration:none;}
+.page-meta a:hover{text-decoration:underline;}
+
+/* INTRO CARD */
+.intro-card{background:var(--accent-bg);border:1px solid var(--accent-light);border-radius:var(--radius);padding:24px 28px;margin-bottom:32px;position:relative;overflow:hidden;}
+.intro-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),#f5c842);}
+.intro-card p{font-size:.95rem;color:var(--text2);line-height:1.75;}
+.intro-card .summary{display:inline-block;background:var(--accent-light);color:var(--accent2);font-size:.8rem;font-weight:700;padding:4px 12px;border-radius:50px;margin-bottom:12px;}
+
+/* SECTIONS */
+.section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 32px;margin-bottom:14px;box-shadow:var(--shadow-sm);transition:box-shadow .2s;}
+.section:hover{box-shadow:var(--shadow);}
+.section-head{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+.section-icon{width:40px;height:40px;background:var(--bg2);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.section-title{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--text);letter-spacing:-.01em;}
+.section-body p{font-size:.91rem;line-height:1.78;color:var(--text2);margin-bottom:12px;}
+.section-body p:last-child{margin-bottom:0;}
+.section-body ul{list-style:none;padding:0;margin:10px 0 12px;}
+.section-body ul li{padding:5px 0 5px 20px;position:relative;font-size:.89rem;line-height:1.65;color:var(--text2);}
+.section-body ul li::before{content:"→";position:absolute;left:0;color:var(--accent);font-weight:700;}
+.section-body a{color:var(--accent);font-weight:600;text-decoration:none;}
+.section-body a:hover{text-decoration:underline;}
+.highlight{border-radius:var(--radius-sm);padding:13px 17px;margin:12px 0;font-size:.87rem;line-height:1.65;}
+.highlight.blue{background:var(--blue-bg);border:1px solid var(--blue-border);color:var(--text2);}
+.highlight.blue strong{color:var(--blue);}
+.highlight.green{background:var(--green-bg);border:1px solid var(--green-border);color:var(--text2);}
+.highlight.green strong{color:var(--green);}
+
+/* CONTACT */
+.contact-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;text-align:center;margin-top:24px;box-shadow:var(--shadow);}
+.contact-title{font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--text);margin-bottom:8px;}
+.contact-sub{font-size:.88rem;color:var(--muted);margin-bottom:14px;line-height:1.6;}
+.contact-email{font-weight:700;font-size:1rem;color:var(--accent);text-decoration:none;}
+.contact-email:hover{text-decoration:underline;}
+
+@media(max-width:600px){
+  .topbar{padding:12px 16px;}.main{padding:36px 16px 80px;}
+  .section{padding:22px 18px;}.intro-card{padding:20px 18px;}
+}
+
+/* ── SITE NAV TABS ── */
+.site-nav{background:var(--card);border-bottom:2px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none;}
+.site-nav::-webkit-scrollbar{display:none;}
+.site-nav-tab{display:inline-flex;align-items:center;gap:7px;padding:13px 18px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:.86rem;color:var(--muted);text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;background:none;border-left:none;border-right:none;border-top:none;cursor:pointer;margin-bottom:-2px;}
+.site-nav-tab:hover{color:var(--accent);}
+.site-nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:700;}
+
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="/index.html" class="logo">🧠 Brain-Friendly Notes</a>
+  <div class="topbar-right">
+    <a href="/index.html" class="nav-btn">← Back to App</a>
+    <button class="nav-btn" onclick="toggleDark()"><span id="ti">🌙</span> <span id="tl">Dark</span></button>
+  </div>
+</div>
+
+<!-- ══ SITE NAV ══ -->
+<nav class="site-nav">
+  <a href="/index.html" class="site-nav-tab">🧠 App</a>
+  <a href="/about.html" class="site-nav-tab">ℹ️ About</a>
+  <a href="/funding.html" class="site-nav-tab">☕ Support</a>
+  <a href="/privacy-policy.html" class="site-nav-tab active">🔒 Privacy & Contact</a>
+</nav>
+
+
+<div class="main">
+
+  <div class="page-header fade-up d1">
+    <div class="page-eyebrow">Legal</div>
+    <h1 class="page-title">Privacy Policy</h1>
+    <p class="page-meta">Effective March 5, 2026 &nbsp;·&nbsp; <a href="https://adhdnotemodifier.com">adhdnotemodifier.com</a></p>
+  </div>
+
+  <div class="intro-card fade-up d2">
+    <span class="summary">Short version</span>
+    <p>We collect only what we need to run the app. We don't sell your data. Ever. Here's the full picture in plain English.</p>
+  </div>
+
+  <div class="section fade-up d2">
+    <div class="section-head">
+      <div class="section-icon">👋</div>
+      <div class="section-title">1. Who We Are</div>
+    </div>
+    <div class="section-body">
+      <p>ADHD Notes is an independent web application at <strong>adhdnotemodifier.com</strong>, built and maintained by one person.</p>
+      <p>Questions about privacy? Reach us at <a href="/cdn-cgi/l/email-protection#20414448444e4f54454d4f44494649455260474d41494c0e434f4d"><span class="__cf_email__" data-cfemail="fd9c99959993928998909299949b94988fbd9a909c9491d39e9290">[email&#160;protected]</span></a></p>
+    </div>
+  </div>
+
+  <div class="section fade-up d3">
+    <div class="section-head">
+      <div class="section-icon">📋</div>
+      <div class="section-title">2. What We Collect</div>
+    </div>
+    <div class="section-body">
+      <p><strong>Account information (optional):</strong> If you create an account, we collect your email address and an encrypted password.</p>
+      <p><strong>Content you submit:</strong> Documents, text, images, or files you upload are temporarily sent to Anthropic's AI to generate your notes. This content is not stored after processing unless you are logged in and choose to save.</p>
+      <p><strong>Saved notes:</strong> If you save notes, that content is stored securely in our database and only accessible through your account.</p>
+      <p><strong>Basic usage data:</strong> Our hosting provider (Vercel) may collect anonymized page visit data. This does not identify you personally.</p>
+      <div class="highlight blue"><strong>Passwords</strong> are always encrypted. We never store them in plain text.</div>
+    </div>
+  </div>
+
+  <div class="section fade-up d3">
+    <div class="section-head">
+      <div class="section-icon">🎯</div>
+      <div class="section-title">3. How We Use Your Info</div>
+    </div>
+    <div class="section-body">
+      <ul>
+        <li>To provide and operate the ADHD Notes tool</li>
+        <li>To save and retrieve your notes if you have an account</li>
+        <li>To respond to questions or support requests you send us</li>
+        <li>To improve app performance and features</li>
+        <li>To display ads and affiliate content on the Funding page to help cover operating costs</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section fade-up d3">
+    <div class="section-head">
+      <div class="section-icon">🔗</div>
+      <div class="section-title">4. Third-Party Services</div>
+    </div>
+    <div class="section-body">
+      <p>We use the following services to operate this app:</p>
+      <ul>
+        <li><strong>Anthropic API</strong> — processes your submitted content to generate reformatted notes. <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener">Anthropic's privacy policy →</a></li>
+        <li><strong>Supabase</strong> — stores account information and saved notes securely</li>
+        <li><strong>Vercel</strong> — hosts the application and may collect anonymized traffic data</li>
+        <li><strong>Google AdSense</strong> — may display ads on our Funding page and uses cookies to serve relevant ads</li>
+        <li><strong>Ko-fi</strong> — processes voluntary donations (Ko-fi's privacy policy applies)</li>
+        <li><strong>Amazon Associates & other affiliates</strong> — affiliate links on the Funding page may use cookies to track referrals</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section fade-up d3">
+    <div class="section-head">
+      <div class="section-icon">🍪</div>
+      <div class="section-title">5. Cookies</div>
+    </div>
+    <div class="section-body">
+      <p>We don't use cookies beyond what's needed to keep you logged in. Third-party services like Google AdSense may place cookies for ad personalization. You can manage cookie preferences through your browser settings.</p>
+    </div>
+  </div>
+
+  <div class="section fade-up d3">
+    <div class="section-head">
+      <div class="section-icon">🗑️</div>
+      <div class="section-title">6. Your Rights & Data Deletion</div>
+    </div>
+    <div class="section-body">
+      <p>You have the right to:</p>
+      <ul>
+        <li>Access the data we hold about you</li>
+        <li>Request correction of inaccurate data</li>
+        <li>Request deletion of your account and all associated data</li>
+        <li>Withdraw consent at any time by deleting your account</li>
+      </ul>
+      <div class="highlight green">
+        <strong>To request deletion:</strong> Email <a href="/cdn-cgi/l/email-protection#b9d8ddd1ddd7d6cddcd4d6ddd0dfd0dccbf9ded4d8d0d597dad6d4"><span class="__cf_email__" data-cfemail="ec8d88848882839889818388858a85899eac8b818d8580c28f8381">[email&#160;protected]</span></a> with the subject line <strong>"Data Deletion Request."</strong> We'll process your request within 30 days.
+      </div>
+    </div>
+  </div>
+
+  <div class="section fade-up d3">
+    <div class="section-head">
+      <div class="section-icon">🔐</div>
+      <div class="section-title">7. Data Security</div>
+    </div>
+    <div class="section-body">
+      <p>Passwords are encrypted and never stored in plain text. Saved notes are stored in a secured database with access controls. No method of internet transmission is 100% secure, and we cannot guarantee absolute security.</p>
+    </div>
+  </div>
+
+  <div class="section fade-up d3">
+    <div class="section-head">
+      <div class="section-icon">👦</div>
+      <div class="section-title">8. Children's Privacy</div>
+    </div>
+    <div class="section-body">
+      <p>ADHD Notes is not directed at children under 13. We do not knowingly collect information from children under 13. If you believe a child has provided personal information, contact us and we will delete it promptly.</p>
+    </div>
+  </div>
+
+  <div class="section fade-up d3">
+    <div class="section-head">
+      <div class="section-icon">📝</div>
+      <div class="section-title">9. Changes to This Policy</div>
+    </div>
+    <div class="section-body">
+      <p>We may update this Privacy Policy from time to time. When we do, we'll update the effective date at the top of this page. Continued use of the app after changes means you accept the updated policy.</p>
+    </div>
+  </div>
+
+  <div class="contact-card fade-up d3">
+    <div class="contact-title">Questions about privacy?</div>
+    <p class="contact-sub">We're happy to help. Reach out anytime — we're a real person, not a support ticket system.</p>
+    <a href="/cdn-cgi/l/email-protection#5637323e32383922333b39323f303f332416313b373f3a7835393b" class="
