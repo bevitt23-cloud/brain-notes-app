@@ -437,10 +437,10 @@ textarea::placeholder{color:var(--muted);}
   <span style="color:var(--border)">|</span>
   <a href="/privacy-policy.html" class="footer-link">🔒 Privacy Policy</a>
   <span style="color:var(--border)">|</span>
-  <a href="mailto:adhdnotemodifier@gmail.com" class="footer-link">📬 Contact</a>
+  <a href="mailto&#58;adhdnotemodifier&#64;gmail&#46;com" class="footer-link">📬 Contact</a>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 const SB_URL = 'https://epagtlrtzwdvferumowx.supabase.co';
 const SB_KEY = 'sb_publishable_JLHb8iewqq_RbrmZc5dmHg_KmNRSRra';
 const db = window.supabase.createClient(SB_URL, SB_KEY);
@@ -799,6 +799,4 @@ function showOk(id,msg){const el=document.getElementById(id);if(!el)return;el.te
 function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
 
 document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('auth-pass')?.addEventListener('keydown',e=>{if(e.key==='Enter')doAuth();});
-  document.getElementById('forgot-email')?.addEventListener('keydown',e=>{if(e.key==='Enter')doForgot();});
-  docume
+  document.getElementById('auth-pass')?.addEventListener('keyd
