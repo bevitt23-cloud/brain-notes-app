@@ -437,7 +437,7 @@ textarea::placeholder{color:var(--muted);}
   <span style="color:var(--border)">|</span>
   <a href="/privacy-policy.html" class="footer-link">🔒 Privacy Policy</a>
   <span style="color:var(--border)">|</span>
-  <span class="footer-link">📬 adhdnotemodifier@gmail.com</span>
+  <span class="footer-link">📬 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4a2b2e222e24253e2f27252e232c232f380a2d272b232664292527">[email&#160;protected]</a></span>
 </div>
 
 <script>
@@ -796,7 +796,4 @@ function setText(id,t){const el=document.getElementById(id);if(el)el.textContent
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function showErr(id,msg){const el=document.getElementById(id);if(!el)return;el.textContent='⚠️ '+msg;el.classList.remove('hidden');}
 function showOk(id,msg){const el=document.getElementById(id);if(!el)return;el.textContent=msg;el.classList.remove('hidden');}
-function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
-
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('auth-pass')?.addEventListener('keyd
+function toast(msg){const t=document
