@@ -32,37 +32,25 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;transition:background .3s,color .3s;}
-
-/* TOPBAR */
 .topbar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
 .logo{font-family:'Architects Daughter',cursive;font-size:1.3rem;color:var(--accent);display:flex;align-items:center;gap:10px;text-decoration:none;}
 .topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
 .nav-btn{background:transparent;border:1.5px solid var(--border);border-radius:50px;padding:7px 18px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:.83rem;color:var(--muted);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .2s;}
 .nav-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg);}
-
-/* SITE NAV TABS */
 .site-nav{background:var(--card);border-bottom:2px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none;}
 .site-nav::-webkit-scrollbar{display:none;}
 .site-nav-tab{display:inline-flex;align-items:center;gap:7px;padding:13px 18px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:.86rem;color:var(--muted);text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;background:none;border-left:none;border-right:none;border-top:none;cursor:pointer;margin-bottom:-2px;}
 .site-nav-tab:hover{color:var(--accent);}
 .site-nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:700;}
-
-/* ANIMATIONS */
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
 .fade-up{animation:fadeUp .5s ease both;}
 .d1{animation-delay:.05s;}.d2{animation-delay:.13s;}.d3{animation-delay:.21s;}.d4{animation-delay:.29s;}
-
-/* MAIN */
 .main{max-width:820px;margin:0 auto;padding:52px 24px 100px;}
-
-/* HERO */
 .hero{text-align:center;margin-bottom:52px;}
 .hero-eyebrow{display:inline-block;background:var(--accent-light);color:var(--accent2);font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 14px;border-radius:50px;margin-bottom:18px;}
 .hero-title{font-family:'DM Serif Display',serif;font-size:clamp(1.9rem,5vw,2.7rem);color:var(--text);line-height:1.15;margin-bottom:16px;letter-spacing:-.02em;}
 .hero-title em{font-style:italic;color:var(--accent);}
 .hero-sub{font-size:1rem;color:var(--muted);max-width:500px;margin:0 auto;line-height:1.8;}
-
-/* CARDS */
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:30px 34px;margin-bottom:14px;box-shadow:var(--shadow);transition:box-shadow .2s;}
 .card:hover{box-shadow:var(--shadow-lg);}
 .card-accent{position:relative;overflow:hidden;}
@@ -71,26 +59,15 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .card-body{font-size:.92rem;color:var(--text2);line-height:1.8;}
 .card-body p{margin-bottom:12px;}
 .card-body p:last-child{margin-bottom:0;}
-
-/* DIVIDER */
 .divider{display:flex;align-items:center;gap:16px;margin:44px 0 24px;}
 .divider-line{flex:1;height:1px;background:var(--border);}
 .divider-text{font-family:'DM Serif Display',serif;font-style:italic;font-size:.95rem;color:var(--muted);white-space:nowrap;}
-
-/* FEATURE GRID */
 .feature-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:6px;}
 .feature-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;transition:all .2s;}
 .feature-item:hover{border-color:var(--accent);background:var(--accent-bg);transform:translateY(-2px);box-shadow:var(--shadow);}
 .feature-icon{font-size:1.6rem;margin-bottom:10px;}
 .feature-name{font-weight:700;font-size:.95rem;color:var(--text);margin-bottom:5px;}
 .feature-desc{font-size:.8rem;color:var(--muted);line-height:1.55;}
-
-/* WHO IT HELPS */
-.who-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:6px;}
-.who-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;display:flex;align-items:center;gap:12px;font-size:.9rem;font-weight:600;color:var(--text2);}
-.who-icon{font-size:1.4rem;flex-shrink:0;}
-
-/* INFO BOXES */
 .info-box{border-radius:var(--radius-sm);padding:14px 18px;font-size:.88rem;line-height:1.65;margin-top:14px;}
 .info-box.blue{background:var(--blue-bg);border:1px solid var(--blue-border);color:var(--text2);}
 .info-box.blue strong{color:var(--blue);}
@@ -98,17 +75,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .info-box.green strong{color:var(--green);}
 .info-box.purple{background:var(--purple-bg);border:1px solid var(--purple-border);color:var(--text2);}
 .info-box.purple strong{color:var(--purple);}
-
-/* CTA */
 .cta-card{background:linear-gradient(135deg,var(--accent-bg) 0%,var(--bg2) 100%);border:1px solid var(--accent-light);border-radius:var(--radius);padding:36px;text-align:center;margin-top:14px;}
 .cta-title{font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--text);margin-bottom:10px;letter-spacing:-.01em;}
 .cta-sub{font-size:.92rem;color:var(--muted);margin-bottom:24px;line-height:1.7;max-width:420px;margin-left:auto;margin-right:auto;}
 .cta-btn{display:inline-flex;align-items:center;gap:9px;background:var(--accent);color:#fff;border:none;border-radius:50px;padding:14px 32px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;text-decoration:none;box-shadow:0 4px 16px rgba(232,146,10,.28);transition:all .2s;}
 .cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,146,10,.38);}
-
-/* TOAST */
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:11px 26px;border-radius:50px;font-weight:600;font-size:.87rem;z-index:9999;box-shadow:var(--shadow-lg);pointer-events:none;animation:fadeUp .25s ease;}
-
 @media(max-width:600px){
   .topbar{padding:12px 16px;}.main{padding:36px 16px 80px;}
   .card{padding:22px 18px;}.site-nav{padding:0 12px;}
@@ -139,30 +111,14 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     <p class="hero-sub">Brain-Friendly Notes was built by one person who understands that studying with ADHD or dyslexia looks different — and that's okay.</p>
   </div>
 
-  <!-- THE STORY -->
-  <div class="card card-accent fade-up d2">
-    <div class="card-title">Hi! I'm B. 👋</div>
+  <!-- HOW IT WORKS — at the top -->
+  <div class="card fade-up d1">
+    <div class="card-title">How It Works</div>
     <div class="card-body">
-      <p>I was diagnosed with ADHD as an adult — after years of struggling with comprehension, task completion, and a whole lot of other things I didn't have words for yet. I could never understand how people could read so quickly and easily when I was <strong style="color:var(--accent);">re-reading the same paragraph five times</strong> and still couldn't get the full context. <strong>My eyes would just <em>scan.</em></strong> Words were there. Understanding wasn't. </p>
-
-      <p>My journey with school... well, it's been a long one, to say the least. But I love learning. That part never went away.</p>
-
-      <p>I'm currently taking online classes, and I have been <em>struggling.</em> A couple of months ago I called my mom, excited to show her my notes. Two hours of studying had produced a beautiful page header wrapped in hand-drawn ink vines, vividly colored leaves, and absolutely no idea what I'd been reading about. I tried to explain my process to her: <span style="background:var(--yellow-bg);border-left:4px solid var(--accent);padding:8px 14px;border-radius:0 8px 8px 0;display:block;margin:10px 0;font-weight:700;font-size:.97rem;">"I have to write out each word to follow along, but that breaks everything up to the point where I lose the context."</span> She offered the advice we've all heard. <span style="background:var(--blue-bg);border:1.5px dashed var(--blue-border);padding:8px 14px;border-radius:8px;display:block;margin:8px 0;font-size:.9rem;color:var(--muted);font-style:italic;">"Just write down the important parts." &nbsp;·&nbsp; "Read it, then summarize it."</span> Love her for trying. But clearly, that wasn't quite working here.</p>
-
-      <p>Fast forward a bit. My fiancé and I are trying to study together. We've been at it for a while. I hit a page I have zero interest in — satisfied with my last note page's doodle situation — and I just... can't do it. I was staring at another blinding white page of text that seemed to buzz and irritate my eyes, and I hit a wall.</p>
-
-      <p>So I took a break for the weekend. And I fixed my problem. <span style="display:inline-block;background:var(--accent);color:#fff;font-weight:800;padding:3px 14px;border-radius:20px;font-size:.97rem;">This site is the result. ✨</span></p>
-
-      <p>I've tried other apps. Paid for some year-long subscriptions that are still active. From my experience, <strong style="color:var(--accent);">they don't quite <em>get it.</em></strong> Yes, the text gets broken down — but where's the color? What if I have a question mid-read? What if something finally clicks and I need to pin that connection before it disappears? Small things. But they make a huge difference when you're actually trying to learn something.</p>
-
-      <p>So I decided to make this public and free. <strong>No subscription. No signup required. No download.</strong> Something easily accessible that keeps the process moving, keeps my hands from cramping, and makes learning actually enjoyable.</p>
-
-      <p>I've got ideas to make this better over time and I'll implement them as I can. This is a hobby project and it does cost money to run — so if it helps you, stop by the support page, check out the products, maybe donate if you're able, and let's see what we can all make of this.</p>
-
-      <p style="font-family:'Architects Daughter',cursive;font-size:1.1rem;color:var(--accent);margin-top:8px;">Happy learning. And thank you for stopping by. 🧡</p>
-      <p style="font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--muted);margin-top:2px;">— B</p>
+      <p>You upload a file, paste text, or drop in a URL. The app sends your content to Claude (Anthropic's AI) with a carefully designed prompt that turns any study material into structured, color-coded, ADHD-friendly notes.</p>
+      <p>Your content is processed securely and is never stored unless you choose to save your notes. No data is sold. No ads in the main app. Ever.</p>
     </div>
-    <div class="info-box purple"><strong>💬 What would help YOU?</strong> I'm always thinking about what to build next — and the best ideas come from real students. If there's a feature, format, or tool that would make your studying easier, I genuinely want to hear it. Send your ideas to <a href="mailto:adhdnotemodifier@gmail.com" style="color:var(--purple);font-weight:700;">adhdnotemodifier@gmail.com</a> — every email gets read. 🧡</div>
+    <div class="info-box blue"><strong>Powered by:</strong> Anthropic Claude AI &nbsp;·&nbsp; Supabase &nbsp;·&nbsp; Vercel &nbsp;·&nbsp; Built with love in Nashville, TN 🎸</div>
   </div>
 
   <div class="divider fade-up d2">
@@ -172,7 +128,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
   </div>
 
   <!-- FEATURES -->
-  <div class="card fade-up d3">
+  <div class="card fade-up d2">
     <div class="card-title">Features Built for Different Brains</div>
     <div class="feature-grid">
       <div class="feature-item">
@@ -220,48 +176,71 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
   <div class="divider fade-up d3">
     <div class="divider-line"></div>
-    <div class="divider-text">Who it's for</div>
+    <div class="divider-text">The story</div>
     <div class="divider-line"></div>
   </div>
 
-  <!-- WHO -->
-  <div class="card fade-up d3">
-    <div class="card-title">This App Was Made For You If...</div>
-    <div class="who-grid">
-      <div class="who-item"><span class="who-icon">⚡</span> You have ADHD</div>
-      <div class="who-item"><span class="who-icon">📚</span> You have dyslexia</div>
-      <div class="who-item"><span class="who-icon">🎓</span> You're a student</div>
-      <div class="who-item"><span class="who-icon">📝</span> You're studying for exams</div>
-      <div class="who-item"><span class="who-icon">🧩</span> Dense text overwhelms you</div>
-      <div class="who-item"><span class="who-icon">🔁</span> You re-read the same paragraph 5 times</div>
-      <div class="who-item"><span class="who-icon">🎯</span> You learn better visually</div>
-      <div class="who-item"><span class="who-icon">💬</span> You prefer plain English</div>
-    </div>
-    <div class="info-box green"><strong>No diagnosis needed.</strong> If your brain finds standard notes hard to work with, this app is for you — full stop.</div>
-  </div>
-
-  <!-- TECH -->
-  <div class="card fade-up d4">
-    <div class="card-title">How It Works</div>
+  <!-- NOTE FROM B -->
+  <div class="card card-accent fade-up d3">
+    <div class="card-title">Hi! I'm B. 👋</div>
     <div class="card-body">
-      <p>You upload a file, paste text, or drop in a URL. The app sends your content to Claude (Anthropic's AI) with a carefully designed prompt that turns any study material into structured, color-coded, ADHD-friendly notes.</p>
-      <p>Your content is processed securely and is never stored unless you choose to save your notes. No data is sold. No ads in the main app. Ever.</p>
+      <p>After getting diagnosed with ADHD as an adult, so many things about myself finally made sense. I've been on a journey of learning how to work <em>with</em> my brain instead of against it.</p>
+
+      <p>After a weekend of studying — getting blinded by page after page of black and white text — I just couldn't do it anymore. I'd tried plenty of ADHD study apps (still have a year-long subscription to one I don't use). None of them gave me what I actually needed. <strong style="color:var(--accent);">I wanted color, simplicity, and speed. I just wanted to read the page.</strong></p>
+
+      <p>So I took a break from studying and made this instead.</p>
+
+      <p>I have a few ideas for features I'd like to add, but this does cost money to run — so I'll upgrade as I can. If it helps you, stop by the support page and click around. 🙂</p>
+
+      <p>And if there's something you'd like to see added, send me an email — I read every one.</p>
+
+      <p style="font-family:'Architects Daughter',cursive;font-size:1.05rem;color:var(--accent);margin-top:8px;">Happy learning. 🧡</p>
+      <p style="font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--muted);margin-top:2px;">— B</p>
     </div>
-    <div class="info-box blue"><strong>Powered by:</strong> Anthropic Claude AI · Supabase · Vercel · Built with love in Nashville, TN 🎸</div>
+    <div class="info-box purple"><strong>💬 Have a feature idea?</strong> Email me at adhdnotemodifier&#64;gmail&#46;com — every message gets read. 🧡</div>
   </div>
 
   <!-- CTA -->
   <div class="cta-card fade-up d4">
-    <div class="cta-title">Ready to try it? 🧠</div>
-    <p class="cta-sub">It's free. No download. No subscription. Just paste your notes and go.</p>
+    <div class="cta-title">Want the app? 📱</div>
+    <p class="cta-sub">No download required — you can add it straight to your home screen and it'll work just like an app.</p>
     <a href="/index.html" class="cta-btn">✨ Open the App</a>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:28px;text-align:left;">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;">
+        <div style="font-size:1.4rem;margin-bottom:8px;">🍎</div>
+        <div style="font-weight:700;font-size:.95rem;color:var(--text);margin-bottom:8px;">iPhone / iPad</div>
+        <ol style="font-size:.82rem;color:var(--muted);line-height:2;padding-left:16px;">
+          <li>Open the site in <strong style="color:var(--text);">Safari</strong></li>
+          <li>Tap the <strong style="color:var(--text);">Share button</strong> (box with arrow pointing up)</li>
+          <li>Scroll down and tap <strong style="color:var(--text);">"Add to Home Screen"</strong></li>
+          <li>Tap <strong style="color:var(--text);">Add</strong> — done! 🎉</li>
+        </ol>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;">
+        <div style="font-size:1.4rem;margin-bottom:8px;">🤖</div>
+        <div style="font-weight:700;font-size:.95rem;color:var(--text);margin-bottom:8px;">Android</div>
+        <ol style="font-size:.82rem;color:var(--muted);line-height:2;padding-left:16px;">
+          <li>Open the site in <strong style="color:var(--text);">Chrome</strong></li>
+          <li>Tap the <strong style="color:var(--text);">three dots menu</strong> (top right)</li>
+          <li>Tap <strong style="color:var(--text);">"Add to Home Screen"</strong></li>
+          <li>Tap <strong style="color:var(--text);">Add</strong> — done! 🎉</li>
+        </ol>
+      </div>
+    </div>
+    <p style="font-size:.8rem;color:var(--muted);margin-top:16px;">It'll appear on your home screen just like a real app — no App Store needed.</p>
   </div>
 
 </div>
 
 <script>
-let dark=false;
-function toggleDark(){dark=!dark;document.documentElement.setAttribute('data-theme',dark?'dark':'light');document.getElementById('ti').textContent=dark?'☀️':'🌙';document.getElementById('tl').textContent=dark?'Light':'Dark';}
+let dark = false;
+function toggleDark() {
+  dark = !dark;
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  document.getElementById('ti').textContent = dark ? '☀️' : '🌙';
+  document.getElementById('tl').textContent = dark ? 'Light' : 'Dark';
+}
 </script>
 </body>
 </html>
