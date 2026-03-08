@@ -19,22 +19,27 @@
   --shadow:4px 4px 0px #e0d0b8;--shadow-sm:2px 2px 0px #e0d0b8;--radius:16px;
 }
 [data-theme="dark"] {
-  --bg:#1a1610;--bg2:#201c14;--card:#2a2418;--border:#3a3020;--text:#f0e8d8;--muted:#a09070;
-  --accent:#f5a623;--accent2:#e8913a;--yellow:#a07800;--yellow-bg:#2a2400;
-  --green:#0a5020;--green-bg:#0a1e10;--blue:#083060;--blue-bg:#080e1e;
-  --pink:#60182a;--pink-bg:#1e0810;--purple:#381860;--purple-bg:#100818;
-  --orange:#602008;--orange-bg:#1e0c04;
-  --shadow:4px 4px 0px #100c06;--shadow-sm:2px 2px 0px #100c06;
+  --bg:#0d1f14;--bg2:#112a1a;--card:#163522;--border:#2a4a34;--text:#e8f5ee;--muted:#7aab8a;
+  --accent:#e8a730;--accent2:#d4921a;--yellow:#c47e00;--yellow-bg:#1a2e10;
+  --green:#3aaa6a;--green-bg:#0e2a18;--blue:#3a8abf;--blue-bg:#0a1e30;
+  --pink:#bf5a7a;--pink-bg:#2a0e18;--purple:#8a5abf;--purple-bg:#1a0e2a;
+  --orange:#d4782a;--orange-bg:#2a1408;
+  --shadow:0 4px 20px rgba(0,0,0,.5);--shadow-sm:0 2px 8px rgba(0,0,0,.4);
 }
-[data-mode="dyslexic"] body,[data-mode="dyslexic"] input,[data-mode="dyslexic"] textarea,[data-mode="dyslexic"] button,[data-mode="dyslexic"] select{font-family:'OpenDyslexic','Plus Jakarta Sans',sans-serif!important;letter-spacing:0.05em;word-spacing:0.15em;}
-[data-mode="dyslexic"] .n-chunk p,[data-mode="dyslexic"] .n-box p,[data-mode="dyslexic"] .n-list li,[data-mode="dyslexic"] .n-vocab-item{font-family:'OpenDyslexic',sans-serif!important;line-height:2.2!important;font-size:1.05rem!important;letter-spacing:0.04em;word-spacing:0.2em;}
-[data-mode="dyslexic"] h1,[data-mode="dyslexic"] .n-section-title{font-family:'OpenDyslexic',sans-serif!important;letter-spacing:0.03em;}
+/* DYSLEXIA MODE — based on Madjidi & Crick (2024) research:
+   warm yellow background, dark text, 14pt+, 1.5 line spacing, left-aligned, OpenDyslexic font */
+[data-mode="dyslexic"] body{background:#fffbe6!important;color:#1a1200!important;}
+[data-mode="dyslexic"] input,[data-mode="dyslexic"] textarea,[data-mode="dyslexic"] button,[data-mode="dyslexic"] select{font-family:'OpenDyslexic','Plus Jakarta Sans',sans-serif!important;letter-spacing:0.05em;word-spacing:0.15em;}
+[data-mode="dyslexic"] .n-chunk p,[data-mode="dyslexic"] .n-box p,[data-mode="dyslexic"] .n-list li,[data-mode="dyslexic"] .n-vocab-item{font-family:'OpenDyslexic',sans-serif!important;line-height:1.8!important;font-size:1.1rem!important;letter-spacing:0.04em;word-spacing:0.2em;color:#1a1200!important;text-align:left!important;}
+[data-mode="dyslexic"] h1,[data-mode="dyslexic"] .n-section-title{font-family:'OpenDyslexic',sans-serif!important;letter-spacing:0.03em;color:#1a1200!important;}
 [data-mode="dyslexic"] em,[data-mode="dyslexic"] i{font-style:normal!important;}
-[data-mode="dyslexic"] .n-section{margin-bottom:2.5rem!important;}
-[data-mode="dyslexic"] .n-chunk{padding:18px 20px!important;line-height:2.2!important;}
-[data-mode="dyslexic"] .n-box{padding:18px 20px!important;line-height:2.2!important;}
-[data-mode="dyslexic"] .n-list li{margin-bottom:12px!important;line-height:2.2!important;}
-[data-mode="dyslexic"] strong{text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:3px;}
+[data-mode="dyslexic"] .n-section{margin-bottom:2.5rem!important;background:#fff8d6!important;border-color:#e8c840!important;}
+[data-mode="dyslexic"] .n-chunk{padding:18px 20px!important;line-height:1.8!important;background:#fffbe6!important;border-left:4px solid #d4a000!important;color:#1a1200!important;}
+[data-mode="dyslexic"] .n-box{padding:18px 20px!important;line-height:1.8!important;color:#1a1200!important;}
+[data-mode="dyslexic"] .n-list li{margin-bottom:12px!important;line-height:1.8!important;color:#1a1200!important;}
+[data-mode="dyslexic"] strong{color:#1a1200!important;text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:3px;font-weight:800!important;}
+[data-mode="dyslexic"] .n-box-label{color:#5a4000!important;font-size:.85rem!important;}
+[data-mode="dyslexic"] #notes-render{background:#fffbe6!important;}
 .mode-toggle-wrap{display:flex;align-items:center;background:var(--bg2);border:2px solid var(--border);border-radius:50px;padding:3px;gap:2px;}
 .mode-btn{padding:6px 14px;border:none;border-radius:50px;font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .2s;white-space:nowrap;}
 .mode-btn.active{background:var(--accent);color:#fff;box-shadow:var(--shadow-sm);}
@@ -312,6 +317,14 @@ textarea::placeholder{color:var(--muted);}
 
 <!-- ══ SITE NAV ══ -->
 <nav class="site-nav">
+  <span class="site-nav-label">🧠 App</span>
+  <button class="mob-nav-toggle" id="mob-nav-toggle" onclick="toggleMobNav()">☰ Menu</button>
+  <div class="mob-nav-menu" id="mob-nav-menu">
+  <a href="/index.html" class=" active">🧠 App</a>
+  <a href="/about.html" class="">ℹ️ About</a>
+  <a href="/funding.html" class="">☕ Support</a>
+  <a href="/privacy-policy.html" class="">🔒 Privacy & Contact</a>
+  </div>
   <a href="/index.html" class="site-nav-tab active">🧠 App</a>
   <a href="/about.html" class="site-nav-tab">ℹ️ About</a>
   <a href="/funding.html" class="site-nav-tab">☕ Support</a>
@@ -370,8 +383,8 @@ textarea::placeholder{color:var(--muted);}
 
   <div class="loading-box hidden" id="loading-box">
     <div class="spinner"></div>
-    <div class="loading-text">Making your notes...</div>
-    <div class="loading-sub">Fetching content and building something easier for your brain 🧠</div>
+    <div class="loading-text" id="loading-text">Making your notes...</div>
+    <div class="loading-sub" id="loading-sub">Fetching content and building something easier for your brain 🧠</div>
   </div>
 
   <div class="output-section hidden" id="output-section">
@@ -569,14 +582,42 @@ async function extractText(){
   if(selectedFile){
     const ext=selectedFile.name.split('.').pop().toLowerCase();
     if(ext==='txt')return await selectedFile.text();
-    if(ext==='docx'){const ab=await selectedFile.arrayBuffer();const result=await mammoth.extractRawText({arrayBuffer:ab});return{type:'text',content:result.value};}
-    if(ext==='pdf'){const b64=await readB64(selectedFile);return{type:'pdf',content:b64};}
+    if(ext==='docx'){
+      const ab=await selectedFile.arrayBuffer();
+      const docxImages=[];
+      const result=await mammoth.convertToHtml({arrayBuffer:ab},{convertImage:mammoth.images.imgElement(function(image){return image.read('base64').then(function(b64){const src='data:'+image.contentType+';base64,'+b64;docxImages.push({src,type:image.contentType});return{src};});})});
+      return{type:'docx',content:result.value,images:docxImages};
+    }
+    if(ext==='pdf'){
+      const sizeMB=Math.round(selectedFile.size/1024/1024*10)/10;
+      if(selectedFile.size>4.5*1024*1024){
+        // Too large to send directly — extract text on the server instead
+        updateLoadingStatus('Reading your PDF...','This file is '+sizeMB+'MB so we\'re pulling the text out first. Hang tight ⏳');
+        const formData=new FormData();formData.append('file',selectedFile);
+        let resp;
+        try{resp=await fetch('/api/extract-pdf-text',{method:'POST',body:formData});}
+        catch(e){throw new Error('Could not process that PDF. Try copying and pasting the text instead.');}
+        const data=await resp.json();
+        if(!resp.ok||data.error)throw new Error(data.error||'Could not read that PDF. Try copying the text instead.');
+        return{type:'text',content:data.text,wasBigPdf:true,pageCount:data.pageCount};
+      }
+      const b64=await readB64(selectedFile);return{type:'pdf',content:b64};
+    }
     if(['jpg','jpeg','png','webp','gif'].includes(ext)){const b64=await readB64(selectedFile);const mimeMap={jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp',gif:'image/gif'};return{type:'image',content:b64.split(',')[1],mime:mimeMap[ext]||'image/jpeg'};}
     throw new Error('Unsupported file type. Please use PDF, .docx, .txt, or an image file.');
   }
   const urlVal=document.getElementById('url-input')?document.getElementById('url-input').value.trim():'';
   if(urlVal&&urlVal.startsWith('http')){
     let resp,data;
+    // If URL points directly to a PDF, fetch it as binary and send as PDF document
+    if(urlVal.toLowerCase().includes('.pdf')){
+      let pdfResp;
+      try{pdfResp=await fetch('/api/fetch-url',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:urlVal,isPdf:true})});}
+      catch(e){throw new Error('Could not fetch that PDF. Try downloading it and uploading the file instead.');}
+      const pdfData=await pdfResp.json();
+      if(!pdfResp.ok||pdfData.error)throw new Error(pdfData.error||'Could not fetch that PDF URL.');
+      if(pdfData.base64){return{type:'pdf',content:pdfData.base64};}
+    }
     try{resp=await fetch('/api/fetch-url',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:urlVal})});}
     catch(e){throw new Error('Could not connect to the page fetcher. Please paste the text instead.');}
     const rawText=await resp.text();
@@ -609,9 +650,17 @@ async function callClaude(payload){
 
 async function generateNotes(){
   hide('gen-err');let extracted;
-  try{extracted=await extractText();}catch(e){showErr('gen-err',e.message);return;}
+  try{
+    extracted=await extractText();
+    if(extracted&&extracted.wasBigPdf){
+      updateLoadingStatus('Text extracted! Building your notes...','Got '+( extracted.pageCount?' all '+extracted.pageCount+' pages':' the content')+' — now making it brain-friendly 🧠');
+    } else {
+      updateLoadingStatus('Got it! Building your notes...','Sending to Claude now 🧠');
+    }
+  }catch(e){showErr('gen-err',e.message);return;}
   const btn=document.getElementById('gen-btn');btn.disabled=true;
-  show('loading-box');document.getElementById('upload-section').style.opacity='.5';document.getElementById('upload-section').style.pointerEvents='none';
+  show('loading-box');updateLoadingStatus('Reading your file...','Hang tight while we open it up 📂');
+  document.getElementById('upload-section').style.opacity='.5';document.getElementById('upload-section').style.pointerEvents='none';
   try{
     let messages;
     const basePrompt='Convert this study material into ADHD-friendly notes. If you find references to images, diagrams or charts, describe what they likely show based on context and include a visual description box:';
@@ -625,13 +674,32 @@ async function generateNotes(){
       const contentParts=[{type:'text',text:basePrompt+'\n\nPage text:\n'+extracted.content+'\n\nThis page also contains images. After your notes, include a section called "Visual References" that links back to each image and describes what it shows based on context. Use this format for each image: <div class="n-box blue"><div class="n-box-label">🖼 Visual Reference</div><p>[Description of what this image/diagram shows]</p><a href="IMAGE_URL" target="_blank" rel="noopener">View original image</a></div>'}];
       for(let i=0;i<Math.min(extracted.images.length,3);i++){const img=extracted.images[i];contentParts.push({type:'text',text:'Image '+(i+1)+' (alt: '+img.alt+', url: '+img.src+'):'});}
       messages=[{role:'user',content:contentParts}];
+    }else if(extracted.type==='docx'&&extracted.images&&extracted.images.length>0){
+      // Send text + embedded images to Claude so it can see and reference them
+      const parts=[{type:'text',text:basePrompt+'\n\nDocument text (HTML):\n'+extracted.content.replace(/<[^>]+>/g,' ')}];
+      for(let i=0;i<Math.min(extracted.images.length,5);i++){
+        const img=extracted.images[i];
+        const b64=img.src.split(',')[1];
+        parts.push({type:'image',source:{type:'base64',media_type:img.type,data:b64}});
+      }
+      messages=[{role:'user',content:parts}];
     }else{
       messages=[{role:'user',content:basePrompt+'\n\n'+(extracted.content||extracted)}];
     }
+    updateLoadingStatus('Building your notes...','Claude is reading your content and making it brain-friendly 🧠');
     const activePrompt=currentMode==='dyslexic'?DYSLEXIA_PROMPT:SYSTEM_PROMPT;
     let html=await callClaude({model:'claude-sonnet-4-20250514',max_tokens:6000,system:activePrompt,messages});
     const fence=html.match(/```(?:html)?\s*([\s\S]*?)```/i);if(fence)html=fence[1].trim();
     if(!html.includes('<'))html=`<h1>📋 Your Notes</h1><div class="n-section"><div class="n-chunk"><p>${html.replace(/\n/g,'<br>')}</p></div></div>`;
+    // If docx had images, inject them into the rendered output so they display
+    if(extracted&&extracted.type==='docx'&&extracted.images&&extracted.images.length>0){
+      let imgBlock='<div class="n-section"><div class="n-section-title">🖼️ Images from Your Document</div>';
+      extracted.images.forEach(function(img,i){
+        imgBlock+='<div style="margin-bottom:14px;"><img src="'+img.src+'" style="max-width:100%;border-radius:10px;border:2px solid var(--border);display:block;" alt="Document image '+(i+1)+'" /></div>';
+      });
+      imgBlock+='</div>';
+      html=html+imgBlock;
+    }
     currentHTML=html;document.getElementById('notes-render').innerHTML=html;
     restoreStickyNotes([]);show('output-section');if(currentUser)show('save-btn');
     document.getElementById('output-section').scrollIntoView({behavior:'smooth',block:'start'});
@@ -785,7 +853,7 @@ function resetApp(){
 
 function downloadNotes(){
   const c=document.getElementById('notes-render').innerHTML;
-  const h=`<!DOCTYPE html><html data-theme="${dark?'dark':'light'}"><head><meta charset="UTF-8"><title>Brain-Friendly Notes</title><link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Architects+Daughter&display=swap" rel="stylesheet"><style>:root{--bg:#fdf6ec;--bg2:#fef9f2;--card:#fff;--border:#e8ddd0;--text:#2a2010;--muted:#8a7a60;--accent:#f5a623;--yellow:#ffe168;--yellow-bg:#fffbe6;--green:#c8f5d0;--green-bg:#f0fff4;--blue:#c8e8ff;--blue-bg:#f0f8ff;--pink:#ffd6e7;--pink-bg:#fff5f8;--purple:#e8d6ff;--purple-bg:#faf5ff;--orange:#ffe3c8;--orange-bg:#fff8f2;--shadow-sm:2px 2px 0 #e0d0b8;}[data-theme=dark]{--bg:#1a1610;--bg2:#201c14;--card:#2a2418;--border:#3a3020;--text:#f0e8d8;--muted:#a09070;--yellow:#a07800;--yellow-bg:#2a2400;--green:#0a5020;--green-bg:#0a1e10;--blue:#083060;--blue-bg:#080e1e;--pink:#60182a;--pink-bg:#1e0810;--purple:#381860;--purple-bg:#100818;--orange:#602008;--orange-bg:#1e0c04;}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);padding:32px 20px 60px;max-width:780px;margin:0 auto;line-height:1.7}h1{font-family:'Architects Daughter',cursive;font-size:1.8rem;text-align:center;margin-bottom:4px}.subtitle{text-align:center;color:var(--muted);font-size:.88rem;margin-bottom:28px}.n-section{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:20px;box-shadow:var(--shadow-sm)}.n-section-title{font-size:1.05rem;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.n-badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.72rem;font-weight:700;text-transform:uppercase;background:var(--yellow);color:#6a4400}.n-chunk{border-left:4px solid var(--accent);background:var(--yellow-bg);padding:10px 14px;border-radius:0 10px 10px 0;margin-bottom:12px;font-size:.95rem;line-height:1.65}.n-box{border-radius:10px;padding:12px 14px;margin-top:10px;font-size:.91rem;line-height:1.6}.n-box-label{font-weight:800;font-size:.78rem;text-transform:uppercase;margin-bottom:5px}.n-box.yellow{background:var(--yellow-bg);border:1.5px dashed var(--accent)}.n-box.green{background:var(--green-bg);border:1.5px dashed #4caf7d}.n-box.blue{background:var(--blue-bg);border:1.5px dashed #4a90c4}.n-box.pink{background:var(--pink-bg);border:1.5px dashed #d46895}.n-box.purple{background:var(--purple-bg);border:1.5px dashed #9b6dd6}.n-box.orange{background:var(--orange-bg);border:1.5px dashed #d48a3a}.n-highlight{background:var(--yellow);padding:1px 4px;border-radius:4px;font-weight:700;color:#5a3a00}.n-list{list-style:none;padding:0;margin-top:6px}.n-list li{padding:5px 0 5px 20px;position:relative;font-size:.93rem}.n-list li::before{content:"→";position:absolute;left:0;color:var(--accent);font-weight:700}.n-pause{text-align:center;font-family:'Architects Daughter',cursive;font-size:.82rem;color:#6a4400;background:var(--yellow);display:block;width:fit-content;margin:6px auto 18px;padding:4px 16px;border-radius:20px}.n-vocab{display:flex;flex-direction:column;gap:9px}.n-vocab-item{background:var(--purple-bg);border:1.5px solid var(--purple);border-radius:10px;padding:9px 13px;font-size:.91rem}.n-vocab-term{font-weight:800;color:#6a2ab5;font-size:.97rem}</style></head><body>${c}</body></html>`;
+  const h=`<!DOCTYPE html><html data-theme="${dark?'dark':'light'}"><head><meta charset="UTF-8"><title>Brain-Friendly Notes</title><link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Architects+Daughter&display=swap" rel="stylesheet"><style>:root{--bg:#fdf6ec;--bg2:#fef9f2;--card:#fff;--border:#e8ddd0;--text:#2a2010;--muted:#8a7a60;--accent:#f5a623;--yellow:#ffe168;--yellow-bg:#fffbe6;--green:#c8f5d0;--green-bg:#f0fff4;--blue:#c8e8ff;--blue-bg:#f0f8ff;--pink:#ffd6e7;--pink-bg:#fff5f8;--purple:#e8d6ff;--purple-bg:#faf5ff;--orange:#ffe3c8;--orange-bg:#fff8f2;--shadow-sm:2px 2px 0 #e0d0b8;}[data-theme=dark]{--bg:#0d1f14;--bg2:#112a1a;--card:#163522;--border:#2a4a34;--text:#e8f5ee;--muted:#7aab8a;--accent:#e8a730;--yellow:#c47e00;--yellow-bg:#1a2e10;--green:#3aaa6a;--green-bg:#0e2a18;--blue:#3a8abf;--blue-bg:#0a1e30;--pink:#bf5a7a;--pink-bg:#2a0e18;--purple:#8a5abf;--purple-bg:#1a0e2a;--orange:#d4782a;--orange-bg:#2a1408;}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);padding:32px 20px 60px;max-width:780px;margin:0 auto;line-height:1.7}h1{font-family:'Architects Daughter',cursive;font-size:1.8rem;text-align:center;margin-bottom:4px}.subtitle{text-align:center;color:var(--muted);font-size:.88rem;margin-bottom:28px}.n-section{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:20px;box-shadow:var(--shadow-sm)}.n-section-title{font-size:1.05rem;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.n-badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.72rem;font-weight:700;text-transform:uppercase;background:var(--yellow);color:#6a4400}.n-chunk{border-left:4px solid var(--accent);background:var(--yellow-bg);padding:10px 14px;border-radius:0 10px 10px 0;margin-bottom:12px;font-size:.95rem;line-height:1.65}.n-box{border-radius:10px;padding:12px 14px;margin-top:10px;font-size:.91rem;line-height:1.6}.n-box-label{font-weight:800;font-size:.78rem;text-transform:uppercase;margin-bottom:5px}.n-box.yellow{background:var(--yellow-bg);border:1.5px dashed var(--accent)}.n-box.green{background:var(--green-bg);border:1.5px dashed #4caf7d}.n-box.blue{background:var(--blue-bg);border:1.5px dashed #4a90c4}.n-box.pink{background:var(--pink-bg);border:1.5px dashed #d46895}.n-box.purple{background:var(--purple-bg);border:1.5px dashed #9b6dd6}.n-box.orange{background:var(--orange-bg);border:1.5px dashed #d48a3a}.n-highlight{background:var(--yellow);padding:1px 4px;border-radius:4px;font-weight:700;color:#5a3a00}.n-list{list-style:none;padding:0;margin-top:6px}.n-list li{padding:5px 0 5px 20px;position:relative;font-size:.93rem}.n-list li::before{content:"→";position:absolute;left:0;color:var(--accent);font-weight:700}.n-pause{text-align:center;font-family:'Architects Daughter',cursive;font-size:.82rem;color:#6a4400;background:var(--yellow);display:block;width:fit-content;margin:6px auto 18px;padding:4px 16px;border-radius:20px}.n-vocab{display:flex;flex-direction:column;gap:9px}.n-vocab-item{background:var(--purple-bg);border:1.5px solid var(--purple);border-radius:10px;padding:9px 13px;font-size:.91rem}.n-vocab-term{font-weight:800;color:#6a2ab5;font-size:.97rem}</style></head><body>${c}</body></html>`;
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([h],{type:'text/html'}));a.download='brain-friendly-notes.html';a.click();
 }
 
@@ -797,6 +865,12 @@ function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g
 function showErr(id,msg){const el=document.getElementById(id);if(!el)return;el.textContent='⚠️ '+msg;el.classList.remove('hidden');}
 function showOk(id,msg){const el=document.getElementById(id);if(!el)return;el.textContent=msg;el.classList.remove('hidden');}
 function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
+function updateLoadingStatus(main,sub){
+  const lt=document.getElementById('loading-text');
+  const ls=document.getElementById('loading-sub');
+  if(lt)lt.textContent=main;
+  if(ls)ls.textContent=sub||'';
+}
 
 // Enter key support
 document.addEventListener('DOMContentLoaded', () => {
