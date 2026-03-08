@@ -314,22 +314,6 @@ textarea::placeholder{color:var(--muted);}
 <!-- ══ TOPBAR ══ -->
 <div class="topbar">
   <div class="logo">🧠 Brain-Friendly Notes</div>
-
-<!-- ══ SITE NAV ══ -->
-<nav class="site-nav">
-  <span class="site-nav-label">🧠 App</span>
-  <button class="mob-nav-toggle" id="mob-nav-toggle" onclick="toggleMobNav()">☰ Menu</button>
-  <div class="mob-nav-menu" id="mob-nav-menu">
-  <a href="/index.html" class=" active">🧠 App</a>
-  <a href="/about.html" class="">ℹ️ About</a>
-  <a href="/funding.html" class="">☕ Support</a>
-  <a href="/privacy-policy.html" class="">🔒 Privacy & Contact</a>
-  </div>
-  <a href="/index.html" class="site-nav-tab active">🧠 App</a>
-  <a href="/about.html" class="site-nav-tab">ℹ️ About</a>
-  <a href="/funding.html" class="site-nav-tab">☕ Support</a>
-  <a href="/privacy-policy.html" class="site-nav-tab">🔒 Privacy & Contact</a>
-</nav>
   <div class="mode-toggle-wrap">
     <button class="mode-btn active" id="mode-adhd" onclick="setMode('adhd')">🧠 ADHD</button>
     <button class="mode-btn" id="mode-dyslexic" onclick="setMode('dyslexic')">📖 Dyslexia</button>
@@ -342,6 +326,14 @@ textarea::placeholder{color:var(--muted);}
     <button class="topbar-btn" onclick="toggleDark()"><span id="theme-icon">🌙</span> <span id="theme-lbl">Dark Mode</span></button>
   </div>
 </div>
+
+<!-- ══ SITE NAV ══ -->
+<nav class="site-nav">
+  <a href="/index.html" class="site-nav-tab active">🧠 App</a>
+  <a href="/about.html" class="site-nav-tab">ℹ️ About</a>
+  <a href="/funding.html" class="site-nav-tab">☕ Support</a>
+  <a href="/privacy-policy.html" class="site-nav-tab">🔒 Privacy & Contact</a>
+</nav>
 
 <!-- ══ SAVED NOTES PANEL ══ -->
 <div id="notes-panel">
