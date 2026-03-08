@@ -796,4 +796,16 @@ function setText(id,t){const el=document.getElementById(id);if(el)el.textContent
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function showErr(id,msg){const el=document.getElementById(id);if(!el)return;el.textContent='⚠️ '+msg;el.classList.remove('hidden');}
 function showOk(id,msg){const el=document.getElementById(id);if(!el)return;el.textContent=msg;el.classList.remove('hidden');}
-function toast(msg){const t=document
+function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
+
+// Enter key support
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('auth-pass')?.addEventListener('keydown', e => { if (e.key==='Enter') doAuth(); });
+  document.getElementById('forgot-email')?.addEventListener('keydown', e => { if (e.key==='Enter') doForgot(); });
+  document.getElementById('save-folder-sel')?.addEventListener('change', function() {
+    if (this.value === '__new__') toggleNewFolder(true);
+  });
+});
+</script>
+</body>
+</html>
