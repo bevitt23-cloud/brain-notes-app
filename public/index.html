@@ -351,7 +351,7 @@ textarea::placeholder{color:var(--muted);}
   <div class="upload-section" id="upload-section">
     <div class="section-label">📂 Step 1 -- Add Your Content</div>
     <div class="drop-zone" id="drop-zone">
-      <input type="file" id="file-input" accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.gif,.mp4,.mov,.webm,.pptx" />
+      <input type="file" id="file-input" accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.gif" />
       <div class="drop-icon">📄</div>
       <div class="drop-text">Drop a file here, or click to browse</div>
       <div class="drop-sub">Supports: PDF, Word (.docx), .txt, or image files (JPG, PNG)</div>
@@ -570,21 +570,16 @@ fileInput.addEventListener('change',()=>{if(fileInput.files[0])handleFile(fileIn
 function handleFile(f){selectedFile=f;setText('file-name-lbl','📎 '+f.name);document.getElementById('file-preview').classList.remove('hidden');document.getElementById('file-preview').classList.add('visible');document.getElementById('paste-input').value='';}
 function clearFile(){selectedFile=null;fileInput.value='';document.getElementById('file-preview').classList.add('hidden');document.getElementById('file-preview').classList.remove('visible');}
 
-async function extractText() {
-  if (selectedFile) {
-    const ext = selectedFile.name.split('.').pop().toLowerCase();
-    
-    // Existing logic for txt, docx, pdf...
-    if (ext === 'txt') return await selectedFile.text();
-    
-    // NEW: Add PowerPoint support
-    if (ext === 'pptx') {
-      // Gemini can handle PPTX directly via the File API in 2026
-      // For now, we treat it like a document upload
-      const b64 = await readB64(selectedFile);
-      return { type: 'pptx', content: b64, name: selectedFile.name };
+async function extractText(){
+  if(selectedFile){
+    const ext=selectedFile.name.split('.').pop().toLowerCase();
+    if(ext==='txt')return await selectedFile.text();
+    if(ext==='docx'){
+      const ab=await selectedFile.arrayBuffer();
+      const docxImages=[];
+      const result=await mammoth.convertToHtml({arrayBuffer:ab},{convertImage:mammoth.images.imgElement(function(image){return image.read('base64').then(function(b64){const src='data:'+image.contentType+';base64,'+b64;docxImages.push({src,type:image.contentType});return{src};});})});
+      return{type:'docx',content:result.value,images:docxImages};
     }
-
     if(ext==='pdf'){
       const sizeMB=Math.round(selectedFile.size/1024/1024*10)/10;
       if(selectedFile.size>4.5*1024*1024){
@@ -630,50 +625,21 @@ async function extractText() {
 
 function readB64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(new Error('Could not read file'));r.readAsDataURL(file);});}
 
-async function callAI(payload) {
+async function callClaude(payload){
   let resp;
-  let usedGemini = true;
-
-  // 1. Try Gemini first (Higher limits)
-  try {
-    resp = await fetch('/api/gemini', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-  } catch (e) {
-    console.warn("Gemini fetch failed, trying Claude...");
+  try{resp=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});}
+  catch(e){throw new Error('Could not connect to the notes generator. Check your internet and try again.');}
+  const rawText=await resp.text();let data;
+  try{data=JSON.parse(rawText);}catch(e){if(resp.status===504)throw new Error('The request took too long. Try pasting just one section of text at a time.');throw new Error('Something went wrong. Please try again.');}
+  if(!resp.ok){
+    if(resp.status===401)throw new Error('API key error. Please contact the site owner.');
+    if(resp.status===429)throw new Error('Too many requests. Wait 30 seconds and try again.');
+    if(resp.status===504)throw new Error('The request took too long. Try pasting just one section of text at a time.');
+    throw new Error(data?.error||data?.error?.message||'Something went wrong. Please try again.');
   }
-
-  // 2. Fallback to Claude if Gemini fails
-  if (!resp || !resp.ok) {
-    usedGemini = false;
-    try {
-      resp = await fetch('/api/claude', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-    } catch (e) {
-      throw new Error('Could not connect to any AI service. Please check your internet.');
-    }
-  }
-
-  const rawText = await resp.text();
-  let data;
-  try { 
-    data = JSON.parse(rawText); 
-  } catch(e) {
-    throw new Error('AI response error. Try a smaller amount of text.');
-  }
-
-  if (!resp.ok) {
-    throw new Error(data?.error || 'Something went wrong. Please try again.');
-  }
-
-  // Both APIs now return data in the same format via our backend handlers
-  return data.content.filter(b => b.type === 'text').map(b => b.text).join('').trim();
+  return data.content.filter(b=>b.type==='text').map(b=>b.text).join('').trim();
 }
+
 async function generateNotes(){
   hide('gen-err');let extracted;
   try{
@@ -712,16 +678,9 @@ async function generateNotes(){
     }else{
       messages=[{role:'user',content:basePrompt+'\n\n'+(extracted.content||extracted)}];
     }
-    updateLoadingStatus('Building your notes...','The AI is reading your content and making it brain-friendly 🧠');
-const activePrompt=currentMode==='dyslexic'?DYSLEXIA_PROMPT:SYSTEM_PROMPT;
-
-// We use callAI now, which handles the Gemini -> Claude logic automatically
-let html = await callAI({
-  model: 'gemini-3.1-flash', // Default to Gemini
-  max_tokens: 6000,
-  system: activePrompt,
-  messages
-});
+    updateLoadingStatus('Building your notes...','Claude is reading your content and making it brain-friendly 🧠');
+    const activePrompt=currentMode==='dyslexic'?DYSLEXIA_PROMPT:SYSTEM_PROMPT;
+    let html=await callClaude({model:'claude-sonnet-4-20250514',max_tokens:6000,system:activePrompt,messages});
     const fence=html.match(/```(?:html)?\s*([\s\S]*?)```/i);if(fence)html=fence[1].trim();
     if(!html.includes('<'))html=`<h1>📋 Your Notes</h1><div class="n-section"><div class="n-chunk"><p>${html.replace(/\n/g,'<br>')}</p></div></div>`;
     // If docx had images, inject them into the rendered output so they display
