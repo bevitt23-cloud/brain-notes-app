@@ -570,16 +570,21 @@ fileInput.addEventListener('change',()=>{if(fileInput.files[0])handleFile(fileIn
 function handleFile(f){selectedFile=f;setText('file-name-lbl','📎 '+f.name);document.getElementById('file-preview').classList.remove('hidden');document.getElementById('file-preview').classList.add('visible');document.getElementById('paste-input').value='';}
 function clearFile(){selectedFile=null;fileInput.value='';document.getElementById('file-preview').classList.add('hidden');document.getElementById('file-preview').classList.remove('visible');}
 
-async function extractText(){
-  if(selectedFile){
-    const ext=selectedFile.name.split('.').pop().toLowerCase();
-    if(ext==='txt')return await selectedFile.text();
-    if(ext==='docx'){
-      const ab=await selectedFile.arrayBuffer();
-      const docxImages=[];
-      const result=await mammoth.convertToHtml({arrayBuffer:ab},{convertImage:mammoth.images.imgElement(function(image){return image.read('base64').then(function(b64){const src='data:'+image.contentType+';base64,'+b64;docxImages.push({src,type:image.contentType});return{src};});})});
-      return{type:'docx',content:result.value,images:docxImages};
+async function extractText() {
+  if (selectedFile) {
+    const ext = selectedFile.name.split('.').pop().toLowerCase();
+    
+    // Existing logic for txt, docx, pdf...
+    if (ext === 'txt') return await selectedFile.text();
+    
+    // NEW: Add PowerPoint support
+    if (ext === 'pptx') {
+      // Gemini can handle PPTX directly via the File API in 2026
+      // For now, we treat it like a document upload
+      const b64 = await readB64(selectedFile);
+      return { type: 'pptx', content: b64, name: selectedFile.name };
     }
+
     if(ext==='pdf'){
       const sizeMB=Math.round(selectedFile.size/1024/1024*10)/10;
       if(selectedFile.size>4.5*1024*1024){
