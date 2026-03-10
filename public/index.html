@@ -707,9 +707,16 @@ async function generateNotes(){
     }else{
       messages=[{role:'user',content:basePrompt+'\n\n'+(extracted.content||extracted)}];
     }
-    updateLoadingStatus('Building your notes...','Claude is reading your content and making it brain-friendly 🧠');
-    const activePrompt=currentMode==='dyslexic'?DYSLEXIA_PROMPT:SYSTEM_PROMPT;
-    let html=await callClaude({model:'claude-sonnet-4-20250514',max_tokens:6000,system:activePrompt,messages});
+    updateLoadingStatus('Building your notes...','The AI is reading your content and making it brain-friendly 🧠');
+const activePrompt=currentMode==='dyslexic'?DYSLEXIA_PROMPT:SYSTEM_PROMPT;
+
+// We use callAI now, which handles the Gemini -> Claude logic automatically
+let html = await callAI({
+  model: 'gemini-3.1-flash', // Default to Gemini
+  max_tokens: 6000,
+  system: activePrompt,
+  messages
+});
     const fence=html.match(/```(?:html)?\s*([\s\S]*?)```/i);if(fence)html=fence[1].trim();
     if(!html.includes('<'))html=`<h1>📋 Your Notes</h1><div class="n-section"><div class="n-chunk"><p>${html.replace(/\n/g,'<br>')}</p></div></div>`;
     // If docx had images, inject them into the rendered output so they display
