@@ -26,8 +26,6 @@
   --orange:#d4782a;--orange-bg:#2a1408;
   --shadow:0 4px 20px rgba(0,0,0,.5);--shadow-sm:0 2px 8px rgba(0,0,0,.4);
 }
-/* DYSLEXIA MODE — based on Madjidi & Crick (2024) research:
-   warm yellow background, dark text, 14pt+, 1.5 line spacing, left-aligned, OpenDyslexic font */
 [data-mode="dyslexic"] body{background:#fffbe6!important;color:#1a1200!important;}
 [data-mode="dyslexic"] input,[data-mode="dyslexic"] textarea,[data-mode="dyslexic"] button,[data-mode="dyslexic"] select{font-family:'OpenDyslexic','Plus Jakarta Sans',sans-serif!important;letter-spacing:0.05em;word-spacing:0.15em;}
 [data-mode="dyslexic"] .n-chunk p,[data-mode="dyslexic"] .n-box p,[data-mode="dyslexic"] .n-list li,[data-mode="dyslexic"] .n-vocab-item{font-family:'OpenDyslexic',sans-serif!important;line-height:1.8!important;font-size:1.1rem!important;letter-spacing:0.04em;word-spacing:0.2em;color:#1a1200!important;text-align:left!important;}
@@ -46,16 +44,12 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s;}
 .hidden{display:none!important;}
-
-/* ── FUNDING BANNER ── */
 .funding-banner{background:var(--yellow-bg);border-bottom:2px solid var(--accent);padding:10px 24px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;text-align:center;}
 .funding-banner-text{font-size:.88rem;color:#6a4400;font-weight:700;}
 .funding-banner-link{display:inline-flex;align-items:center;gap:5px;background:var(--accent);color:#fff;border:none;border-radius:20px;padding:5px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;text-decoration:none;transition:all .15s;white-space:nowrap;}
 .funding-banner-link:hover{background:var(--accent2);}
 .funding-banner-close{background:none;border:none;cursor:pointer;color:#a07830;font-size:1rem;padding:2px 6px;margin-left:4px;border-radius:6px;transition:background .15s;}
 .funding-banner-close:hover{background:var(--yellow);}
-
-/* ── TOPBAR ── */
 .topbar{background:var(--card);border-bottom:2px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.06);}
 .topbar .logo{flex-shrink:0;}.topbar .topbar-actions{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .logo{font-family:'Architects Daughter',cursive;font-size:1.4rem;color:var(--accent);display:flex;align-items:center;gap:8px;}
@@ -63,8 +57,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .topbar-btn{background:var(--bg2);border:1.5px solid var(--border);border-radius:50px;padding:6px 14px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.85rem;color:var(--text);display:flex;align-items:center;gap:6px;transition:all .2s;}
 .topbar-btn:hover{border-color:var(--accent);color:var(--accent);}
 .user-email{font-size:.78rem;color:var(--muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-
-/* ── MODAL ── */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;}
 .overlay.hidden{display:none!important;}
 .mcard{background:var(--card);border:2px solid var(--border);border-radius:20px;padding:32px 28px;max-width:440px;width:100%;box-shadow:var(--shadow);animation:popIn .2s ease;}
@@ -89,8 +81,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .mlink:hover{text-decoration:underline;}
 .mselect{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.95rem;color:var(--text);background:var(--bg2);margin-bottom:12px;display:block;}
 .mselect:focus{outline:none;border-color:var(--accent);}
-
-/* ── NOTES PANEL ── */
 #notes-panel{position:fixed;top:0;right:-400px;width:360px;height:100vh;background:var(--card);border-left:2px solid var(--border);z-index:400;transition:right .3s ease;box-shadow:-4px 0 20px rgba(0,0,0,.12);display:flex;flex-direction:column;}
 #notes-panel.open{right:0;}
 .panel-header{padding:18px 20px;border-bottom:2px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
@@ -108,8 +98,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .note-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;padding:4px 6px;border-radius:6px;transition:all .15s;flex-shrink:0;}
 .note-del:hover{color:#e04040;background:var(--pink-bg);}
 .panel-empty{text-align:center;color:var(--muted);font-size:.88rem;padding:40px 16px;line-height:1.7;}
-
-/* ── MAIN ── */
 .main{max-width:860px;margin:0 auto;padding:32px 20px 40px;}
 .upload-section{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:28px;margin-bottom:24px;box-shadow:var(--shadow);}
 .section-label{font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
@@ -152,8 +140,6 @@ textarea::placeholder{color:var(--muted);}
 .btn:hover{border-color:var(--accent);color:var(--accent);}
 .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
 .btn.primary:hover{background:var(--accent2);border-color:var(--accent2);color:#fff;}
-
-/* ── NOTES RENDER ── */
 #notes-render{background:var(--bg2);border:2px solid var(--border);border-radius:var(--radius);padding:28px 24px;box-shadow:var(--shadow);}
 #notes-render h1{font-family:'DM Serif Display',serif;font-size:1.8rem;text-align:center;margin-bottom:4px;color:var(--text);}
 #notes-render .subtitle{text-align:center;color:var(--muted);font-size:.88rem;margin-bottom:28px;}
@@ -181,8 +167,6 @@ textarea::placeholder{color:var(--muted);}
 [data-theme="dark"] #notes-render .n-highlight{color:#1a0e00;}
 [data-theme="dark"] #notes-render .n-pause{color:#1a0e00;}
 [data-theme="dark"] #notes-render .n-badge{color:#1a0e00;}
-
-/* ── EXPLAIN TOOLTIP ── */
 #explain-tooltip{position:fixed;z-index:9999;background:var(--card);border:2.5px solid var(--accent);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.18);display:none;flex-direction:column;width:280px;overflow:hidden;}
 #explain-tooltip.visible{display:flex;}
 #explain-tooltip-trigger{display:flex;align-items:center;gap:8px;padding:10px 16px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:.9rem;color:var(--text);background:var(--yellow-bg);border:none;width:100%;text-align:left;transition:background .15s;}
@@ -203,8 +187,6 @@ textarea::placeholder{color:var(--muted);}
 .explain-spin-wrap{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:.9rem;padding:8px 0;}
 .explain-spinner{width:20px;height:20px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:10px 24px;border-radius:30px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.9rem;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2);animation:fadeIn .3s ease;pointer-events:none;}
-
-/* ── STICKY NOTES ── */
 .sticky-note{position:fixed;width:220px;min-height:120px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.18);display:flex;flex-direction:column;z-index:500;font-family:'Plus Jakarta Sans',sans-serif;cursor:move;transition:box-shadow .2s;user-select:none;}
 .sticky-note:hover{box-shadow:0 8px 24px rgba(0,0,0,.22);}
 .sticky-note.minimized{min-height:0;}
@@ -237,34 +219,26 @@ textarea::placeholder{color:var(--muted);}
 .sticky-modal-color-btn:hover{transform:scale(1.2);}
 .sticky-modal-color-btn.selected{border-color:var(--text);transform:scale(1.15);}
 .sticky-modal-actions{display:flex;gap:10px;}
-
-/* ── FOOTER ── */
 .site-footer{background:var(--card);border-top:2px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:20px;}
 .footer-link{font-size:.82rem;color:var(--muted);font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;text-decoration:none;transition:color .15s;}
 .footer-link:hover{color:var(--accent);}
-
 @media print{.topbar,.upload-section,.output-topbar,#explain-tooltip,#explain-panel,#notes-panel,.overlay,.funding-banner,.site-footer{display:none!important;}body{background:#fff;}#notes-render{border:none;box-shadow:none;padding:0;background:#fff;}}
 @media(max-width:540px){.topbar{padding:12px 14px;}.logo{font-size:1.1rem;}.main{padding:20px 12px 40px;}#notes-render{padding:16px 14px;}#notes-panel{width:100%;right:-100%;}}
-
-/* ── SITE NAV TABS ── */
 .site-nav{background:var(--card);border-bottom:2px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none;}
 .site-nav::-webkit-scrollbar{display:none;}
 .site-nav-tab{display:inline-flex;align-items:center;gap:7px;padding:13px 18px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:.86rem;color:var(--muted);text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;background:none;border-left:none;border-right:none;border-top:none;cursor:pointer;margin-bottom:-2px;}
 .site-nav-tab:hover{color:var(--accent);}
 .site-nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:700;}
-
 </style>
 </head>
 <body>
 
-<!-- ══ FUNDING BANNER ══ -->
 <div class="funding-banner" id="funding-banner">
   <span class="funding-banner-text">💛 This tool is free — help keep it running!</span>
   <a href="/funding.html" class="funding-banner-link">☕ Visit the Support Page</a>
   <button class="funding-banner-close" onclick="document.getElementById('funding-banner').style.display='none'" title="Dismiss">✕</button>
 </div>
 
-<!-- ══ AUTH MODAL ══ -->
 <div class="overlay" id="auth-overlay">
   <div class="mcard" id="auth-card">
     <div id="view-login">
@@ -294,7 +268,6 @@ textarea::placeholder{color:var(--muted);}
   </div>
 </div>
 
-<!-- ══ SAVE MODAL ══ -->
 <div class="overlay hidden" id="save-overlay">
   <div class="mcard">
     <div class="mtitle">💾 Save Your Notes</div>
@@ -311,7 +284,6 @@ textarea::placeholder{color:var(--muted);}
   </div>
 </div>
 
-<!-- ══ TOPBAR ══ -->
 <div class="topbar">
   <div class="logo">🧠 Brain-Friendly Notes</div>
   <div class="mode-toggle-wrap">
@@ -327,7 +299,6 @@ textarea::placeholder{color:var(--muted);}
   </div>
 </div>
 
-<!-- ══ SITE NAV ══ -->
 <nav class="site-nav">
   <a href="/index.html" class="site-nav-tab active">🧠 App</a>
   <a href="/about.html" class="site-nav-tab">ℹ️ About</a>
@@ -335,7 +306,6 @@ textarea::placeholder{color:var(--muted);}
   <a href="/privacy-policy.html" class="site-nav-tab">🔒 Privacy & Contact</a>
 </nav>
 
-<!-- ══ SAVED NOTES PANEL ══ -->
 <div id="notes-panel">
   <div class="panel-header">
     <div class="panel-title">📁 My Saved Notes</div>
@@ -346,16 +316,15 @@ textarea::placeholder{color:var(--muted);}
   </div>
 </div>
 
-<!-- ══ MAIN ══ -->
 <div class="main">
   <div class="upload-section" id="upload-section">
     <div class="section-label">📂 Step 1 -- Add Your Content</div>
     <div class="drop-zone" id="drop-zone">
-      <input type="file" id="file-input" accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.gif" />
+      <input type="file" id="file-input" accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.gif,.mp4,.mov,.webm,.pptx" />
       <div class="drop-icon">📄</div>
       <div class="drop-text">Drop a file here, or click to browse</div>
-      <div class="drop-sub">Supports: PDF, Word (.docx), .txt, or image files (JPG, PNG)</div>
-      <div class="drop-tip">💡 Tip: If your PDF is very long, paste one section of text instead</div>
+      <div class="drop-sub">Supports: PDF, PPTX, Video, Word, TXT, or Image files</div>
+      <div class="drop-tip">💡 Tip: Now supports long lecture videos and PowerPoints!</div>
     </div>
     <div class="file-preview hidden" id="file-preview">
       <span id="file-name-lbl">--</span>
@@ -366,7 +335,6 @@ textarea::placeholder{color:var(--muted);}
     <div class="url-input-wrap">
       <input class="url-input" type="url" id="url-input" placeholder="https://example.com/article..." />
     </div>
-    <div class="drop-tip" style="margin-top:6px;">💡 Paste a URL and hit the button below -- we'll grab the text automatically!</div>
     <div class="divider-or">OR</div>
     <textarea id="paste-input" placeholder="Paste your text here..."></textarea>
     <div class="err-box hidden" id="gen-err"></div>
@@ -376,7 +344,7 @@ textarea::placeholder{color:var(--muted);}
   <div class="loading-box hidden" id="loading-box">
     <div class="spinner"></div>
     <div class="loading-text" id="loading-text">Making your notes...</div>
-    <div class="loading-sub" id="loading-sub">Fetching content and building something easier for your brain 🧠</div>
+    <div class="loading-sub" id="loading-sub">Building something easier for your brain 🧠</div>
   </div>
 
   <div class="output-section hidden" id="output-section">
@@ -393,14 +361,12 @@ textarea::placeholder{color:var(--muted);}
   </div>
 </div>
 
-<!-- ══ EXPLAIN TOOLTIP ══ -->
 <div id="explain-tooltip">
   <button id="explain-tooltip-trigger" onclick="openExplainPanel()">💡 Explain this to me</button>
   <button id="sticky-tooltip-trigger" onclick="openStickyModal()" style="display:flex;align-items:center;gap:8px;padding:10px 16px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:.9rem;color:var(--text);background:var(--yellow-bg);border:none;width:100%;text-align:left;transition:background .15s;border-top:1px solid var(--border);">📝 Add sticky note</button>
   <div id="explain-sel-preview"></div>
 </div>
 
-<!-- ══ EXPLAIN PANEL ══ -->
 <div id="explain-panel" class="hidden">
   <div class="explain-inner">
     <div class="explain-hdr">
@@ -414,7 +380,6 @@ textarea::placeholder{color:var(--muted);}
   </div>
 </div>
 
-<!-- ══ STICKY NOTE MODAL ══ -->
 <div id="sticky-modal" class="hidden">
   <div class="sticky-modal-card">
     <div class="sticky-modal-title">📝 Add a Sticky Note</div>
@@ -436,13 +401,12 @@ textarea::placeholder{color:var(--muted);}
   </div>
 </div>
 
-<!-- ══ FOOTER ══ -->
 <div class="site-footer">
   <a href="/funding.html" class="footer-link">☕ Support ADHD Notes</a>
   <span style="color:var(--border)">|</span>
   <a href="/privacy-policy.html" class="footer-link">🔒 Privacy Policy</a>
   <span style="color:var(--border)">|</span>
-  <span class="footer-link">📬 <a href="mailto&#58;adhdnotemodifier&#64;gmail&#46;com">adhdnotemodifier&#64;gmail&#46;com</a></span>
+  <span class="footer-link">📬 <a href="mailto:adhdnotemodifier@gmail.com">adhdnotemodifier@gmail.com</a></span>
 </div>
 
 <script>
@@ -570,66 +534,87 @@ fileInput.addEventListener('change',()=>{if(fileInput.files[0])handleFile(fileIn
 function handleFile(f){selectedFile=f;setText('file-name-lbl','📎 '+f.name);document.getElementById('file-preview').classList.remove('hidden');document.getElementById('file-preview').classList.add('visible');document.getElementById('paste-input').value='';}
 function clearFile(){selectedFile=null;fileInput.value='';document.getElementById('file-preview').classList.add('hidden');document.getElementById('file-preview').classList.remove('visible');}
 
-async function extractText(){
-  if(selectedFile){
-    const ext=selectedFile.name.split('.').pop().toLowerCase();
-    if(ext==='txt')return await selectedFile.text();
-    if(ext==='docx'){
-      const ab=await selectedFile.arrayBuffer();
-      const docxImages=[];
-      const result=await mammoth.convertToHtml({arrayBuffer:ab},{convertImage:mammoth.images.imgElement(function(image){return image.read('base64').then(function(b64){const src='data:'+image.contentType+';base64,'+b64;docxImages.push({src,type:image.contentType});return{src};});})});
-      return{type:'docx',content:result.value,images:docxImages};
+async function extractText() {
+  if (selectedFile) {
+    const ext = selectedFile.name.split('.').pop().toLowerCase();
+    
+    if (ext === 'txt') return await selectedFile.text();
+
+    if (ext === 'pptx') {
+      const b64 = await readB64(selectedFile);
+      return { type: 'pptx', content: b64, name: selectedFile.name };
     }
-    if(ext==='pdf'){
-      const sizeMB=Math.round(selectedFile.size/1024/1024*10)/10;
-      if(selectedFile.size>4.5*1024*1024){
-        // Too large to send directly — extract text on the server instead
-        updateLoadingStatus('Reading your PDF...','This file is '+sizeMB+'MB so we\'re pulling the text out first. Hang tight ⏳');
-        const formData=new FormData();formData.append('file',selectedFile);
-        let resp;
-        try{resp=await fetch('/api/extract-pdf-text',{method:'POST',body:formData});}
-        catch(e){throw new Error('Could not process that PDF. Try copying and pasting the text instead.');}
-        const data=await resp.json();
-        if(!resp.ok||data.error)throw new Error(data.error||'Could not read that PDF. Try copying the text instead.');
-        return{type:'text',content:data.text,wasBigPdf:true,pageCount:data.pageCount};
+
+    if (ext === 'docx') {
+      const ab = await selectedFile.arrayBuffer();
+      const docxImages = [];
+      const result = await mammoth.convertToHtml({ arrayBuffer: ab }, {
+        convertImage: mammoth.images.imgElement(function(image) {
+          return image.read('base64').then(function(b64) {
+            const src = 'data:' + image.contentType + ';base64,' + b64;
+            docxImages.push({ src, type: image.contentType });
+            return { src };
+          });
+        })
+      });
+      return { type: 'docx', content: result.value, images: docxImages };
+    }
+
+    if (['mp4', 'mov', 'webm'].includes(ext)) {
+      const b64 = await readB64(selectedFile);
+      const mimeMap = { mp4: 'video/mp4', mov: 'video/quicktime', webm: 'video/webm' };
+      return { type: 'video', content: b64.split(',')[1], mime: mimeMap[ext] };
+    }
+
+    if (ext === 'pdf') {
+      const sizeMB = Math.round(selectedFile.size / 1024 / 1024 * 10) / 10;
+      if (selectedFile.size > 4.5 * 1024 * 1024) {
+        updateLoadingStatus('Reading your PDF...', 'This file is ' + sizeMB + 'MB so we\'re pulling the text out first. Hang tight ⏳');
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        let resp = await fetch('/api/extract-pdf-text', { method: 'POST', body: formData });
+        const data = await resp.json();
+        if (!resp.ok || data.error) throw new Error(data.error || 'Could not read PDF.');
+        return { type: 'text', content: data.text, wasBigPdf: true, pageCount: data.pageCount };
       }
-      const b64=await readB64(selectedFile);return{type:'pdf',content:b64};
+      const b64 = await readB64(selectedFile);
+      return { type: 'pdf', content: b64 };
     }
-    if(['jpg','jpeg','png','webp','gif'].includes(ext)){const b64=await readB64(selectedFile);const mimeMap={jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp',gif:'image/gif'};return{type:'image',content:b64.split(',')[1],mime:mimeMap[ext]||'image/jpeg'};}
-    throw new Error('Unsupported file type. Please use PDF, .docx, .txt, or an image file.');
-  }
-  const urlVal=document.getElementById('url-input')?document.getElementById('url-input').value.trim():'';
-  if(urlVal&&urlVal.startsWith('http')){
-    let resp,data;
-    // If URL points directly to a PDF, fetch it as binary and send as PDF document
-    if(urlVal.toLowerCase().includes('.pdf')){
-      let pdfResp;
-      try{pdfResp=await fetch('/api/fetch-url',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:urlVal,isPdf:true})});}
-      catch(e){throw new Error('Could not fetch that PDF. Try downloading it and uploading the file instead.');}
-      const pdfData=await pdfResp.json();
-      if(!pdfResp.ok||pdfData.error)throw new Error(pdfData.error||'Could not fetch that PDF URL.');
-      if(pdfData.base64){return{type:'pdf',content:pdfData.base64};}
+
+    if (['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext)) {
+      const b64 = await readB64(selectedFile);
+      const mimeMap = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', gif: 'image/gif' };
+      return { type: 'image', content: b64.split(',')[1], mime: mimeMap[ext] || 'image/jpeg' };
     }
-    try{resp=await fetch('/api/fetch-url',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:urlVal})});}
-    catch(e){throw new Error('Could not connect to the page fetcher. Please paste the text instead.');}
-    const rawText=await resp.text();
-    try{data=JSON.parse(rawText);}catch(e){throw new Error('This website is blocking outside access. Try copying and pasting the text instead.');}
-    if(!resp.ok||data.error)throw new Error(data.error||'Could not fetch that URL. Try pasting the text instead.');
-    if(!data.text)throw new Error('Could not extract text from that page. Try copying and pasting instead.');
-    return{type:'url',content:data.text,images:data.images||[],sourceUrl:data.sourceUrl};
+    
+    throw new Error('Unsupported file type. Please use PDF, PPTX, Video, Word, or Images.');
   }
-  const p=document.getElementById('paste-input').value.trim();
-  if(p)return{type:'text',content:p};
-  throw new Error('Please upload a file, enter a URL, or paste some text first.');
+
+  const urlVal = document.getElementById('url-input')?.value.trim();
+  if (urlVal && urlVal.startsWith('http')) {
+    let resp, data;
+    if (urlVal.toLowerCase().includes('.pdf')) {
+      let pdfResp = await fetch('/api/fetch-url', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: urlVal, isPdf: true }) });
+      const pdfData = await pdfResp.json();
+      if (!pdfResp.ok || pdfData.error) throw new Error(pdfData.error || 'Could not fetch PDF URL.');
+      if (pdfData.base64) return { type: 'pdf', content: pdfData.base64 };
+    }
+    resp = await fetch('/api/fetch-url', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: urlVal }) });
+    const rawText = await resp.text();
+    data = JSON.parse(rawText);
+    if (!resp.ok || data.error) throw new Error(data.error || 'Could not fetch URL.');
+    return { type: 'url', content: data.text, images: data.images || [], sourceUrl: data.sourceUrl };
+  }
+
+  const p = document.getElementById('paste-input').value.trim();
+  if (p) return { type: 'text', content: p };
+  throw new Error('Please upload a file, enter a URL, or paste text.');
 }
 
 function readB64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(new Error('Could not read file'));r.readAsDataURL(file);});}
 
 async function callAI(payload) {
   let resp;
-  let usedGemini = true;
-
-  // 1. Try Gemini first (Higher limits)
   try {
     resp = await fetch('/api/gemini', {
       method: 'POST',
@@ -637,12 +622,10 @@ async function callAI(payload) {
       body: JSON.stringify(payload)
     });
   } catch (e) {
-    console.warn("Gemini fetch failed, trying Claude...");
+    console.warn("Gemini fetch failed, trying Claude fallback...");
   }
 
-  // 2. Fallback to Claude if Gemini fails
   if (!resp || !resp.ok) {
-    usedGemini = false;
     try {
       resp = await fetch('/api/claude', {
         method: 'POST',
@@ -650,25 +633,17 @@ async function callAI(payload) {
         body: JSON.stringify(payload)
       });
     } catch (e) {
-      throw new Error('Could not connect to any AI service. Please check your internet.');
+      throw new Error('Could not connect to any AI service. Please check your connection.');
     }
   }
 
   const rawText = await resp.text();
-  let data;
-  try { 
-    data = JSON.parse(rawText); 
-  } catch(e) {
-    throw new Error('AI response error. Try a smaller amount of text.');
-  }
+  const data = JSON.parse(rawText);
+  if (!resp.ok) throw new Error(data?.error || 'Something went wrong.');
 
-  if (!resp.ok) {
-    throw new Error(data?.error || 'Something went wrong. Please try again.');
-  }
-
-  // Both APIs now return data in the same format via our backend handlers
   return data.content.filter(b => b.type === 'text').map(b => b.text).join('').trim();
 }
+
 async function generateNotes(){
   hide('gen-err');let extracted;
   try{
@@ -676,7 +651,7 @@ async function generateNotes(){
     if(extracted&&extracted.wasBigPdf){
       updateLoadingStatus('Text extracted! Building your notes...','Got '+( extracted.pageCount?' all '+extracted.pageCount+' pages':' the content')+' — now making it brain-friendly 🧠');
     } else {
-      updateLoadingStatus('Got it! Building your notes...','Sending to Claude now 🧠');
+      updateLoadingStatus('Got it! Building your notes...','The AI is reading your content 🧠');
     }
   }catch(e){showErr('gen-err',e.message);return;}
   const btn=document.getElementById('gen-btn');btn.disabled=true;
@@ -684,223 +659,32 @@ async function generateNotes(){
   document.getElementById('upload-section').style.opacity='.5';document.getElementById('upload-section').style.pointerEvents='none';
   try{
     let messages;
-    const basePrompt='Convert this study material into ADHD-friendly notes. If you find references to images, diagrams or charts, describe what they likely show based on context and include a visual description box:';
+    const basePrompt='Convert this study material into ADHD-friendly notes. Focus on chunking information and highlighting key takeaways.';
+    
     if(extracted.type==='pdf'){
       const b64=extracted.content.split(',')[1]||extracted.content;
-      if(b64.length<100)throw new Error('Could not read PDF. Try pasting the text instead.');
       messages=[{role:'user',content:[{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},{type:'text',text:basePrompt}]}];
+    }else if(extracted.type==='pptx'){
+      messages=[{role:'user',content:[{type:'document',source:{type:'base64',media_type:'application/vnd.openxmlformats-officedocument.presentationml.presentation',data:extracted.content.split(',')[1]}},{type:'text',text:basePrompt + " This is a PowerPoint. Summarize it slide-by-slide."}]}];
+    }else if(extracted.type==='video'){
+      messages=[{role:'user',content:[{type:'video',source:{type:'base64',media_type:extracted.mime,data:extracted.content}},{type:'text',text:basePrompt + " This is a video lecture. Provide timestamps for major topics."}]}];
     }else if(extracted.type==='image'){
-      messages=[{role:'user',content:[{type:'image',source:{type:'base64',media_type:extracted.mime,data:extracted.content}},{type:'text',text:'This is a study image, diagram, or chart. Convert it into ADHD-friendly notes. Describe what the image shows in detail, including any labels, arrows, processes, or relationships shown. Include a visual description box in the notes.'}]}];
-    }else if(extracted.type==='url'&&extracted.images&&extracted.images.length>0){
-      const contentParts=[{type:'text',text:basePrompt+'\n\nPage text:\n'+extracted.content+'\n\nThis page also contains images. After your notes, include a section called "Visual References" that links back to each image and describes what it shows based on context. Use this format for each image: <div class="n-box blue"><div class="n-box-label">🖼 Visual Reference</div><p>[Description of what this image/diagram shows]</p><a href="IMAGE_URL" target="_blank" rel="noopener">View original image</a></div>'}];
-      for(let i=0;i<Math.min(extracted.images.length,3);i++){const img=extracted.images[i];contentParts.push({type:'text',text:'Image '+(i+1)+' (alt: '+img.alt+', url: '+img.src+'):'});}
-      messages=[{role:'user',content:contentParts}];
-    }else if(extracted.type==='docx'&&extracted.images&&extracted.images.length>0){
-      // Send text + embedded images to Claude so it can see and reference them
-      const parts=[{type:'text',text:basePrompt+'\n\nDocument text (HTML):\n'+extracted.content.replace(/<[^>]+>/g,' ')}];
-      for(let i=0;i<Math.min(extracted.images.length,5);i++){
-        const img=extracted.images[i];
-        const b64=img.src.split(',')[1];
-        parts.push({type:'image',source:{type:'base64',media_type:img.type,data:b64}});
-      }
-      messages=[{role:'user',content:parts}];
+      messages=[{role:'user',content:[{type:'image',source:{type:'base64',media_type:extracted.mime,data:extracted.content}},{type:'text',text:basePrompt}]}];
     }else{
       messages=[{role:'user',content:basePrompt+'\n\n'+(extracted.content||extracted)}];
     }
-    updateLoadingStatus('Building your notes...','Claude is reading your content and making it brain-friendly 🧠');
+
     const activePrompt=currentMode==='dyslexic'?DYSLEXIA_PROMPT:SYSTEM_PROMPT;
-    let html=await callClaude({model:'claude-sonnet-4-20250514',max_tokens:6000,system:activePrompt,messages});
-    const fence=html.match(/```(?:html)?\s*([\s\S]*?)```/i);if(fence)html=fence[1].trim();
-    if(!html.includes('<'))html=`<h1>📋 Your Notes</h1><div class="n-section"><div class="n-chunk"><p>${html.replace(/\n/g,'<br>')}</p></div></div>`;
-    // If docx had images, inject them into the rendered output so they display
-    if(extracted&&extracted.type==='docx'&&extracted.images&&extracted.images.length>0){
-      let imgBlock='<div class="n-section"><div class="n-section-title">🖼️ Images from Your Document</div>';
-      extracted.images.forEach(function(img,i){
-        imgBlock+='<div style="margin-bottom:14px;"><img src="'+img.src+'" style="max-width:100%;border-radius:10px;border:2px solid var(--border);display:block;" alt="Document image '+(i+1)+'" /></div>';
-      });
-      imgBlock+='</div>';
-      html=html+imgBlock;
-    }
-    currentHTML=html;document.getElementById('notes-render').innerHTML=html;
-    restoreStickyNotes([]);show('output-section');if(currentUser)show('save-btn');
-    document.getElementById('output-section').scrollIntoView({behavior:'smooth',block:'start'});
-  }catch(e){
-    showErr('gen-err',e.message);
-    document.getElementById('upload-section').style.opacity='1';document.getElementById('upload-section').style.pointerEvents='auto';
-  }finally{btn.disabled=false;hide('loading-box');}
-}
+    let html=await callAI({model:'gemini-3.1-flash',max_tokens:6000,system:activePrompt,messages});
+    const fence=html.match(/
+http://googleusercontent.com/immersive_entry_chip/0
 
-const SYSTEM_PROMPT=`You are an expert at converting study material into ADHD-friendly notes. Return ONLY valid HTML using these exact CSS classes -- no markdown, no explanations.
-RULES:
-- Break into 3-7 short sections with emoji titles.
-- Use .n-chunk for plain-English summaries. Short sentences. One idea per line.
-- Use .n-box with colors: blue=facts/definitions, green=steps/processes, yellow=write this down, pink=warnings/catches, purple=vocab, orange=examples.
-- Bold key words with <strong>. Use <span class="n-highlight"> for key terms.
-- Add .n-pause between every section.
-- End with a .n-vocab key terms recap.
-- IMAGES AND DIAGRAMS: When you see or detect a diagram, chart, image, or visual (from a PDF, image file, or URL), always add a pink visual description box describing what it shows in plain English. Use this format: <div class="n-box pink"><div class="n-box-label">🖼 Visual: What This Shows</div><p>Plain English description of the diagram/chart/image</p></div>. If you have a URL for the image, add a link: <a href="URL" target="_blank" rel="noopener" style="color:var(--accent);font-weight:700;">View original image</a>
-STRUCTURE: <h1>Title</h1><p class="subtitle">subtitle</p> then sections: <div class="n-section"><div class="n-section-title"><span>emoji</span> Title <span class="n-badge">Big Idea</span></div><div class="n-chunk"><p>text</p></div><div class="n-box blue"><div class="n-box-label">📘 Label</div>content</div><ul class="n-list"><li>item</li></ul></div><span class="n-pause">✅ Pause -- Got it? Move on when ready.</span> -- end with: <div class="n-section"><div class="n-section-title"><span>🔑</span> Key Terms</div><div class="n-vocab"><div class="n-vocab-item"><span class="n-vocab-term">Term</span> -- definition</div></div></div>
-Return ONLY the HTML.`;
+---
 
-const DYSLEXIA_PROMPT=`You are an expert at converting study material into dyslexia-friendly notes. Return ONLY valid HTML using these exact CSS classes -- no markdown, no explanations.
-RULES:
-- Break into 3-7 short sections with emoji titles.
-- Use VERY short sentences -- maximum 10 words each. One idea per line. No long paragraphs.
-- Use simple, common words. Avoid jargon. If a technical word is needed, immediately define it in plain English.
-- NEVER use italics or ALL CAPS for emphasis. Use <strong> for bold instead.
-- Use .n-chunk for plain-English summaries.
-- Use .n-box with colors: blue=facts/definitions, green=steps/processes, yellow=write this down, pink=warnings/catches, purple=vocab, orange=examples.
-- Add .n-pause between every section.
-- End with a .n-vocab key terms recap with very simple definitions.
-- IMAGES AND DIAGRAMS: When you see or detect a diagram, chart, image, or visual, always add a pink visual description box. Describe it in very simple short sentences. Use this format: <div class="n-box pink"><div class="n-box-label">🖼 Visual: What This Shows</div><p>Simple description here.</p></div>
-- Use numbered lists instead of bullet points where possible.
-STRUCTURE: <h1>Title</h1><p class="subtitle">subtitle</p> then sections: <div class="n-section"><div class="n-section-title"><span>emoji</span> Title <span class="n-badge">Big Idea</span></div><div class="n-chunk"><p>text with <strong>bold key words</strong></p></div><div class="n-box blue"><div class="n-box-label">📘 Label</div>content</div><ol class="n-list"><li>item</li></ol></div><span class="n-pause">✅ Pause -- Got it? Move on when ready.</span> -- end with: <div class="n-section"><div class="n-section-title"><span>🔑</span> Key Terms</div><div class="n-vocab"><div class="n-vocab-item"><span class="n-vocab-term">Term</span> -- simple definition</div></div></div>
-Return ONLY the HTML.`;
+### **Important Deployment Notes**
 
-let currentMode='adhd';
-function setMode(mode){
-  currentMode=mode;document.documentElement.setAttribute('data-mode',mode);
-  document.getElementById('mode-adhd').classList.toggle('active',mode==='adhd');
-  document.getElementById('mode-dyslexic').classList.toggle('active',mode==='dyslexic');
-  const sub=document.querySelector('.upload-section .section-label');
-  if(sub)sub.textContent=mode==='dyslexic'?'📂 Step 1 -- Add Your Content (Dyslexia Mode 📖)':'📂 Step 1 -- Add Your Content';
-}
+1.  **API Key Name:** I changed the variable to `GEMINI_KEY` in the handler code earlier. Please make sure that in your **GitHub Secrets** or **Vercel/Host Environment Variables**, you have a key named `GEMINI_KEY` with your Google AI Studio key.
+2.  **The API Route:** This HTML assumes you have created the new `/api/gemini.js` file we discussed earlier. If you haven't created that file yet, the "✨ Turn Into Brain-Friendly Notes" button will fail and switch to Claude.
+3.  **Video Limits:** Most hosting providers (like Vercel) have a **4.5MB limit** for their free-tier API routes. If your users upload a massive 50MB video, the request might timeout before it reaches Gemini. In the future, we can look at "Streaming" uploads to solve this, but for standard lecture segments, this will work perfectly.
 
-let stickyNotes=[],stickyColor='#ffe168',activeStickyRef='',dragState=null;
-
-function openStickyModal(){
-  document.getElementById('sticky-modal').classList.remove('hidden');
-  document.getElementById('sticky-modal-ref').textContent='"'+(selectedText.length>80?selectedText.substring(0,80)+'...':selectedText)+'"';
-  document.getElementById('sticky-modal-text').value='';activeStickyRef=selectedText;stickyColor='#ffe168';
-  document.querySelectorAll('.sticky-modal-color-btn').forEach(b=>b.classList.remove('selected'));
-  document.querySelector('.sticky-modal-color-btn[data-color="#ffe168"]').classList.add('selected');
-  document.getElementById('sticky-modal-text').focus();
-  document.getElementById('explain-tooltip').classList.remove('visible');
-}
-function closeStickyModal(){document.getElementById('sticky-modal').classList.add('hidden');}
-function selectStickyColor(btn){document.querySelectorAll('.sticky-modal-color-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');stickyColor=btn.dataset.color;}
-
-function saveStickyNote(){
-  const text=document.getElementById('sticky-modal-text').value.trim();if(!text)return;
-  const note={id:'sticky-'+Date.now(),text,color:stickyColor,ref:activeStickyRef,x:20,y:20+(stickyNotes.length*20),minimized:false};
-  stickyNotes.push(note);renderStickyNote(note);closeStickyModal();
-}
-
-function renderStickyNote(note){
-  const container=document.getElementById('notes-render');if(!container)return;
-  const el=document.createElement('div');
-  el.className='sticky-note'+(note.minimized?' minimized':'');el.id=note.id;
-  el.style.cssText=`background:${note.color};left:${note.x}px;top:${note.y}px;position:fixed;`;
-  const refShort=note.ref.length>40?note.ref.substring(0,40)+'...':note.ref;
-  const textShort=note.text.length>30?note.text.substring(0,30)+'...':note.text;
-  el.innerHTML=`<div class="sticky-header"><span class="sticky-handle">${note.minimized?textShort:'📝 My Note'}</span><div class="sticky-actions"><button class="sticky-btn" onclick="toggleStickyMinimize('${note.id}')" title="${note.minimized?'Expand':'Minimize'}">${note.minimized?'▼':'▲'}</button><button class="sticky-btn" onclick="deleteStickyNote('${note.id}')" title="Delete">✕</button></div></div><div class="sticky-body"><textarea class="sticky-textarea" placeholder="Type your note..." onmousedown="event.stopPropagation()">${note.text}</textarea><div class="sticky-colors">${['#ffe168','#c8f5d0','#c8e8ff','#ffd6e7','#e8d6ff','#ffe3c8'].map(c=>`<div class="sticky-color-btn${note.color===c?' selected':''}" style="background:${c}" data-color="${c}" onclick="changeStickyColor('${note.id}','${c}',this)"></div>`).join('')}</div><div class="sticky-ref">"${refShort}"</div></div>`;
-  const ta=el.querySelector('.sticky-textarea');
-  ta.addEventListener('input',()=>{const n=stickyNotes.find(s=>s.id===note.id);if(n)n.text=ta.value;});
-  el.querySelector('.sticky-header').addEventListener('mousedown',startDrag);
-  el.querySelector('.sticky-header').addEventListener('touchstart',startDragTouch,{passive:true});
-  container.appendChild(el);
-}
-
-function toggleStickyMinimize(id){
-  const note=stickyNotes.find(s=>s.id===id);if(!note)return;note.minimized=!note.minimized;
-  const el=document.getElementById(id);if(!el)return;el.classList.toggle('minimized',note.minimized);
-  const btn=el.querySelector('.sticky-btn');const handle=el.querySelector('.sticky-handle');
-  btn.textContent=note.minimized?'▼':'▲';btn.title=note.minimized?'Expand':'Minimize';
-  handle.textContent=note.minimized?(note.text.length>30?note.text.substring(0,30)+'...':note.text):'📝 My Note';
-}
-function deleteStickyNote(id){stickyNotes=stickyNotes.filter(s=>s.id!==id);const el=document.getElementById(id);if(el)el.remove();}
-function changeStickyColor(id,color,btn){
-  const note=stickyNotes.find(s=>s.id===id);if(!note)return;note.color=color;
-  const el=document.getElementById(id);if(el){el.style.background=color;el.querySelectorAll('.sticky-color-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');}
-}
-
-function startDrag(e){
-  if(e.target.closest('.sticky-btn')||e.target.closest('.sticky-textarea')||e.target.closest('.sticky-color-btn'))return;
-  const el=e.currentTarget.closest('.sticky-note');const rect=el.getBoundingClientRect();
-  dragState={el,offsetX:e.clientX-rect.left,offsetY:e.clientY-rect.top};el.style.zIndex=600;e.preventDefault();
-}
-function startDragTouch(e){
-  if(e.target.closest('.sticky-btn')||e.target.closest('.sticky-textarea')||e.target.closest('.sticky-color-btn'))return;
-  const touch=e.touches[0];const el=e.currentTarget.closest('.sticky-note');const rect=el.getBoundingClientRect();
-  dragState={el,offsetX:touch.clientX-rect.left,offsetY:touch.clientY-rect.top};el.style.zIndex=600;
-}
-document.addEventListener('mousemove',e=>{if(!dragState)return;const{el,offsetX,offsetY}=dragState;let x=Math.max(-180,Math.min(e.clientX-offsetX,window.innerWidth-40));let y=Math.max(0,Math.min(e.clientY-offsetY,window.innerHeight-40));el.style.left=x+'px';el.style.top=y+'px';const note=stickyNotes.find(s=>s.id===el.id);if(note){note.x=x;note.y=y;}});
-document.addEventListener('touchmove',e=>{if(!dragState)return;const touch=e.touches[0];const{el,offsetX,offsetY}=dragState;let x=Math.max(-180,Math.min(touch.clientX-offsetX,window.innerWidth-40));let y=Math.max(0,Math.min(touch.clientY-offsetY,window.innerHeight-40));el.style.left=x+'px';el.style.top=y+'px';const note=stickyNotes.find(s=>s.id===el.id);if(note){note.x=x;note.y=y;}},{passive:true});
-document.addEventListener('mouseup',()=>{if(dragState){dragState.el.style.zIndex=500;dragState=null;}});
-document.addEventListener('touchend',()=>{if(dragState){dragState.el.style.zIndex=500;dragState=null;}});
-
-function getStickyNotesData(){return stickyNotes.map(n=>{const el=document.getElementById(n.id);const ta=el?el.querySelector('.sticky-textarea'):null;return{...n,text:ta?ta.value:n.text};});}
-function restoreStickyNotes(notes){stickyNotes.forEach(n=>{const el=document.getElementById(n.id);if(el)el.remove();});stickyNotes=[];if(!notes||!notes.length)return;notes.forEach(n=>{stickyNotes.push(n);renderStickyNote(n);});}
-document.getElementById('sticky-modal').addEventListener('click',function(e){if(e.target===this)closeStickyModal();});
-
-const tooltip=document.getElementById('explain-tooltip'),expPanel=document.getElementById('explain-panel');
-document.addEventListener('mouseup',onSel);document.addEventListener('touchend',onSel);
-document.addEventListener('mousedown',e=>{if(!tooltip.contains(e.target))tooltip.classList.remove('visible');});
-
-function onSel(e){
-  if(tooltip.contains(e.target)||expPanel.contains(e.target))return;
-  setTimeout(()=>{
-    const sel=window.getSelection();const text=sel?sel.toString().trim():'';const nr=document.getElementById('notes-render');
-    if(!nr||!text||text.length<2){tooltip.classList.remove('visible');return;}
-    let node=sel.anchorNode,inside=false;while(node){if(node===nr){inside=true;break;}node=node.parentNode;}
-    if(!inside){tooltip.classList.remove('visible');return;}
-    selectedText=text;document.getElementById('explain-sel-preview').textContent='"'+(text.length>60?text.substring(0,60)+'...':text)+'"';
-    const rect=sel.getRangeAt(0).getBoundingClientRect();const W=280;
-    let left=rect.left+rect.width/2-W/2,top=rect.top-10;
-    left=Math.max(8,Math.min(left,window.innerWidth-W-8));if(top<60)top=rect.bottom+10;
-    tooltip.style.cssText=`left:${left}px;top:${top}px;width:${W}px;`;tooltip.classList.add('visible');
-  },10);
-}
-
-async function openExplainPanel(){
-  if(!selectedText)return;tooltip.classList.remove('visible');
-  document.getElementById('explain-q').textContent='"'+(selectedText.length>80?selectedText.substring(0,80)+'...':selectedText)+'"';
-  document.getElementById('explain-body').innerHTML='<div class="explain-spin-wrap"><div class="explain-spinner"></div> Explaining this for you...</div>';
-  show('explain-panel');window.scrollBy({top:120,behavior:'smooth'});
-  try{
-    const result=await callClaude({model:'claude-sonnet-4-20250514',max_tokens:600,
-      system:`You are a patient tutor helping someone with ADHD. Explain in plain English, 3-5 sentences max. Use a real-life analogy if helpful. Return only simple HTML with <strong> for key words and ONE colored box: <div class="e-box yellow">✏️ <strong>Remember:</strong> ...</div> OR <div class="e-box blue">📘 <strong>In plain English:</strong> ...</div> OR <div class="e-box green">📗 <strong>Real life example:</strong> ...</div>. No markdown.`,
-      messages:[{role:'user',content:`Explain this from my study notes: "${selectedText}"`}]});
-    document.getElementById('explain-body').innerHTML=result;
-  }catch(e){document.getElementById('explain-body').innerHTML=`<div class="e-box yellow">⚠️ ${e.message}</div>`;}
-}
-function closeExplainPanel(){hide('explain-panel');selectedText='';}
-
-function resetApp(){
-  hide('output-section');document.getElementById('upload-section').style.cssText='';
-  document.getElementById('paste-input').value='';hide('gen-err');document.getElementById('notes-render').innerHTML='';
-  hide('save-btn');currentHTML='';clearFile();window.scrollTo({top:0,behavior:'smooth'});
-}
-
-function downloadNotes(){
-  const c=document.getElementById('notes-render').innerHTML;
-  const h=`<!DOCTYPE html><html data-theme="${dark?'dark':'light'}"><head><meta charset="UTF-8"><title>Brain-Friendly Notes</title><link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Architects+Daughter&display=swap" rel="stylesheet"><style>:root{--bg:#fdf6ec;--bg2:#fef9f2;--card:#fff;--border:#e8ddd0;--text:#2a2010;--muted:#8a7a60;--accent:#f5a623;--yellow:#ffe168;--yellow-bg:#fffbe6;--green:#c8f5d0;--green-bg:#f0fff4;--blue:#c8e8ff;--blue-bg:#f0f8ff;--pink:#ffd6e7;--pink-bg:#fff5f8;--purple:#e8d6ff;--purple-bg:#faf5ff;--orange:#ffe3c8;--orange-bg:#fff8f2;--shadow-sm:2px 2px 0 #e0d0b8;}[data-theme=dark]{--bg:#0d1f14;--bg2:#112a1a;--card:#163522;--border:#2a4a34;--text:#e8f5ee;--muted:#7aab8a;--accent:#e8a730;--yellow:#c47e00;--yellow-bg:#1a2e10;--green:#3aaa6a;--green-bg:#0e2a18;--blue:#3a8abf;--blue-bg:#0a1e30;--pink:#bf5a7a;--pink-bg:#2a0e18;--purple:#8a5abf;--purple-bg:#1a0e2a;--orange:#d4782a;--orange-bg:#2a1408;}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);padding:32px 20px 60px;max-width:780px;margin:0 auto;line-height:1.7}h1{font-family:'Architects Daughter',cursive;font-size:1.8rem;text-align:center;margin-bottom:4px}.subtitle{text-align:center;color:var(--muted);font-size:.88rem;margin-bottom:28px}.n-section{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:20px;box-shadow:var(--shadow-sm)}.n-section-title{font-size:1.05rem;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.n-badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.72rem;font-weight:700;text-transform:uppercase;background:var(--yellow);color:#6a4400}.n-chunk{border-left:4px solid var(--accent);background:var(--yellow-bg);padding:10px 14px;border-radius:0 10px 10px 0;margin-bottom:12px;font-size:.95rem;line-height:1.65}.n-box{border-radius:10px;padding:12px 14px;margin-top:10px;font-size:.91rem;line-height:1.6}.n-box-label{font-weight:800;font-size:.78rem;text-transform:uppercase;margin-bottom:5px}.n-box.yellow{background:var(--yellow-bg);border:1.5px dashed var(--accent)}.n-box.green{background:var(--green-bg);border:1.5px dashed #4caf7d}.n-box.blue{background:var(--blue-bg);border:1.5px dashed #4a90c4}.n-box.pink{background:var(--pink-bg);border:1.5px dashed #d46895}.n-box.purple{background:var(--purple-bg);border:1.5px dashed #9b6dd6}.n-box.orange{background:var(--orange-bg);border:1.5px dashed #d48a3a}.n-highlight{background:var(--yellow);padding:1px 4px;border-radius:4px;font-weight:700;color:#5a3a00}.n-list{list-style:none;padding:0;margin-top:6px}.n-list li{padding:5px 0 5px 20px;position:relative;font-size:.93rem}.n-list li::before{content:"→";position:absolute;left:0;color:var(--accent);font-weight:700}.n-pause{text-align:center;font-family:'Architects Daughter',cursive;font-size:.82rem;color:#6a4400;background:var(--yellow);display:block;width:fit-content;margin:6px auto 18px;padding:4px 16px;border-radius:20px}.n-vocab{display:flex;flex-direction:column;gap:9px}.n-vocab-item{background:var(--purple-bg);border:1.5px solid var(--purple);border-radius:10px;padding:9px 13px;font-size:.91rem}.n-vocab-term{font-weight:800;color:#6a2ab5;font-size:.97rem}</style></head><body>${c}</body></html>`;
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([h],{type:'text/html'}));a.download='brain-friendly-notes.html';a.click();
-}
-
-function show(id){document.getElementById(id)?.classList.remove('hidden');}
-function hide(id){document.getElementById(id)?.classList.add('hidden');}
-function val(id){return document.getElementById(id)?.value||'';}
-function setText(id,t){const el=document.getElementById(id);if(el)el.textContent=t;}
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function showErr(id,msg){const el=document.getElementById(id);if(!el)return;el.textContent='⚠️ '+msg;el.classList.remove('hidden');}
-function showOk(id,msg){const el=document.getElementById(id);if(!el)return;el.textContent=msg;el.classList.remove('hidden');}
-function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
-function updateLoadingStatus(main,sub){
-  const lt=document.getElementById('loading-text');
-  const ls=document.getElementById('loading-sub');
-  if(lt)lt.textContent=main;
-  if(ls)ls.textContent=sub||'';
-}
-
-// Enter key support
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('auth-pass')?.addEventListener('keydown', e => { if (e.key==='Enter') doAuth(); });
-  document.getElementById('forgot-email')?.addEventListener('keydown', e => { if (e.key==='Enter') doForgot(); });
-  document.getElementById('save-folder-sel')?.addEventListener('change', function() {
-    if (this.value === '__new__') toggleNewFolder(true);
-  });
-});
-</script>
-</body>
-</html>
+**Would you like me to help you set up the `/api/extract-pdf-text` logic next to handle those massive PDFs more efficiently?**
