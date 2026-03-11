@@ -129,6 +129,13 @@ textarea::placeholder{color:var(--muted);}
 .file-preview{background:var(--green-bg);border:1.5px solid var(--green);border-radius:10px;padding:10px 14px;margin-top:12px;font-size:.88rem;font-weight:700;color:var(--text);display:none;align-items:center;gap:10px;}
 .file-preview.visible{display:flex;}
 .file-remove{margin-left:auto;cursor:pointer;color:var(--muted);font-size:1.1rem;background:none;border:none;font-weight:900;}
+.retention-toggle-row{display:flex;align-items:center;gap:8px;margin-top:10px;margin-bottom:2px;}
+.ret-switch{width:28px;height:16px;background:#ddd8ce;border-radius:99px;position:relative;transition:background .2s;flex-shrink:0;cursor:pointer;}
+.ret-switch.on{background:var(--accent);}
+.ret-knob{position:absolute;top:2px;left:2px;width:12px;height:12px;background:#fff;border-radius:50%;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.ret-switch.on .ret-knob{left:14px;}
+.ret-label{font-size:.78rem;font-weight:700;color:var(--text);cursor:pointer;user-select:none;}
+.ret-hint{font-size:.72rem;color:var(--muted);margin-top:1px;padding-left:36px;}
 .gen-btn{width:100%;padding:16px;background:var(--accent);color:#fff;border:none;border-radius:14px;font-family:'Architects Daughter',cursive;font-size:1.2rem;cursor:pointer;box-shadow:0 4px 0 var(--accent2);transition:all .15s;margin-top:18px;display:flex;align-items:center;justify-content:center;gap:10px;}
 .gen-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--accent2);}
 .gen-btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--accent2);}
@@ -370,6 +377,11 @@ textarea::placeholder{color:var(--muted);}
     <div class="divider-or">OR</div>
     <textarea id="paste-input" placeholder="Paste your text here..."></textarea>
     <div class="err-box hidden" id="gen-err"></div>
+    <div class="retention-toggle-row">
+      <div class="ret-switch" id="ret-switch" onclick="toggleRetention()"><div class="ret-knob"></div></div>
+      <span class="ret-label" onclick="toggleRetention()">🧪 Retention Quiz</span>
+    </div>
+    <div class="ret-hint" id="ret-hint" style="display:none;">5 quick questions will appear after your notes</div>
     <button class="gen-btn" id="gen-btn" onclick="generateNotes()">✨ Turn Into Brain-Friendly Notes</button>
   </div>
 
@@ -390,6 +402,7 @@ textarea::placeholder{color:var(--muted);}
       </div>
     </div>
     <div id="notes-render"></div>
+    <div id="retention-quiz-section" style="display:none;margin-top:20px;"></div>
   </div>
 </div>
 
@@ -810,6 +823,13 @@ async function generateNotes(){
     }
     currentHTML=html;document.getElementById('notes-render').innerHTML=html;
     restoreStickyNotes([]);show('save-btn');
+    // Retention quiz
+    if(retentionOn){
+      document.getElementById('retention-quiz-section').style.display='none';
+      await generateRetentionQuiz(html);
+    } else {
+      document.getElementById('retention-quiz-section').style.display='none';
+    }
   }catch(e){
     showErr('gen-err',e.message);
     document.getElementById('upload-section').style.opacity='1';document.getElementById('upload-section').style.pointerEvents='auto';
@@ -952,10 +972,196 @@ async function openExplainPanel(){
 }
 function closeExplainPanel(){hide('explain-panel');selectedText='';}
 
+// ── Retention Quiz ──────────────────────────────────────────────
+let retentionOn = false;
+let retQuizAnswers = {}, retQuizRevealed = {}, retQuizData = [];
+
+function toggleRetention() {
+  retentionOn = !retentionOn;
+  const sw = document.getElementById('ret-switch');
+  const hint = document.getElementById('ret-hint');
+  sw.classList.toggle('on', retentionOn);
+  hint.style.display = retentionOn ? 'block' : 'none';
+}
+
+async function generateRetentionQuiz(noteContent) {
+  const section = document.getElementById('retention-quiz-section');
+  section.style.display = 'block';
+  section.innerHTML = `<div style="background:var(--card);border:2px solid var(--border);border-radius:16px;padding:28px;text-align:center;box-shadow:2px 2px 0 var(--border);margin-top:4px;">
+    <div style="width:36px;height:36px;border:3px solid var(--border);border-top:3px solid var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px;"></div>
+    <div style="font-family:'Architects Daughter',cursive;font-size:1.2rem;color:var(--accent);margin-bottom:6px;">Building your quiz...</div>
+    <div style="font-size:.85rem;color:var(--muted);">Reading your notes and writing questions 🧠</div>
+  </div>`;
+
+  const prompt = `You are a study assistant. Based on the following notes, create exactly 5 multiple choice retention questions to test comprehension.
+
+Return ONLY valid JSON in this exact format, no markdown, no extra text:
+{"questions":[{"q":"question text","opts":["A text","B text","C text","D text"],"correct":0,"explain":"brief explanation"}]}
+
+The "correct" field is the 0-based index of the correct answer. Keep questions clear and focused on the most important concepts.
+
+NOTES:
+${noteContent.replace(/<[^>]*>/g,'').substring(0,3000)}`;
+
+  try {
+    const payload = { messages:[{role:'user',content:prompt}], stream:false };
+    let raw = '';
+    // try Gemini first
+    try {
+      const r = await fetch('/api/gemini',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      const d = await r.json();
+      raw = d.content || d.text || '';
+    } catch(e) {
+      const r = await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      const d = await r.json();
+      raw = d.content || d.text || '';
+    }
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    retQuizData = parsed.questions;
+    retQuizAnswers = {};
+    retQuizRevealed = {};
+    renderRetentionBanner();
+  } catch(e) {
+    section.innerHTML = `<div style="background:var(--card);border:2px solid var(--border);border-radius:14px;padding:18px;text-align:center;color:var(--muted);font-size:.88rem;">⚠️ Couldn't generate quiz this time. <span style="cursor:pointer;color:var(--accent);font-weight:700;" onclick="generateRetentionQuiz(document.getElementById('notes-render').innerHTML)">Try again?</span></div>`;
+  }
+}
+
+function renderRetentionBanner() {
+  const section = document.getElementById('retention-quiz-section');
+  const allAnswered = retQuizData.length > 0 && Object.keys(retQuizRevealed).length === retQuizData.length;
+  if (allAnswered) { renderRetentionScore(); return; }
+
+  section.innerHTML = `
+  <div style="background:linear-gradient(135deg,var(--yellow-bg),var(--bg2));border:2.5px solid var(--accent);border-radius:18px;padding:22px 24px;box-shadow:0 4px 0 var(--accent2);text-align:center;margin-bottom:16px;">
+    <div style="font-size:2rem;margin-bottom:8px;">🧪</div>
+    <div style="font-family:'Architects Daughter',cursive;font-size:1.4rem;color:var(--text);margin-bottom:5px;">Ready for your Retention Quiz?</div>
+    <div style="color:var(--muted);font-size:.88rem;margin-bottom:16px;line-height:1.5;">5 quick questions on what you just read.<br><strong>No pressure</strong> — just for you to see what clicked! ✨</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;">
+      <span style="background:var(--card);border:1.5px solid var(--border);border-radius:50px;padding:4px 12px;font-size:.76rem;font-weight:700;color:var(--muted);">📝 5 Questions</span>
+      <span style="background:var(--card);border:1.5px solid var(--border);border-radius:50px;padding:4px 12px;font-size:.76rem;font-weight:700;color:var(--muted);">⚡ Multiple Choice</span>
+      <span style="background:var(--card);border:1.5px solid var(--border);border-radius:50px;padding:4px 12px;font-size:.76rem;font-weight:700;color:var(--muted);">🎯 Instant Feedback</span>
+    </div>
+    <button onclick="renderRetentionQuiz()" style="background:var(--accent);color:#fff;border:none;border-radius:50px;padding:12px 32px;font-family:'Architects Daughter',cursive;font-size:1.05rem;cursor:pointer;box-shadow:0 3px 0 var(--accent2);">Let's Go! 🚀</button>
+    <div onclick="document.getElementById('retention-quiz-section').style.display='none'" style="margin-top:10px;font-size:.78rem;color:var(--muted);cursor:pointer;">Skip for now</div>
+  </div>`;
+}
+
+function renderRetentionQuiz() {
+  const section = document.getElementById('retention-quiz-section');
+  const answered = Object.keys(retQuizRevealed).length;
+  let html = `
+  <div style="background:var(--card);border:2px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:14px;box-shadow:2px 2px 0 var(--border);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <div style="font-family:'Architects Daughter',cursive;font-size:1.1rem;color:var(--text);">🧪 Retention Quiz</div>
+      <div style="font-size:.78rem;font-weight:700;color:var(--muted);">${answered}/${retQuizData.length} answered</div>
+    </div>
+    <div style="height:7px;background:var(--border);border-radius:99px;overflow:hidden;">
+      <div style="height:100%;background:var(--accent);border-radius:99px;width:${(answered/retQuizData.length)*100}%;transition:width .4s;"></div>
+    </div>
+  </div>`;
+
+  retQuizData.forEach((q,qi) => {
+    const isRevealed = retQuizRevealed[qi] !== undefined;
+    const chosen = retQuizAnswers[qi];
+    html += `<div style="background:var(--card);border:2px solid var(--border);border-radius:14px;padding:20px;margin-bottom:12px;box-shadow:2px 2px 0 var(--border);">
+      <div style="font-size:.74rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Question ${qi+1} of ${retQuizData.length}</div>
+      <div style="font-size:.98rem;font-weight:700;color:var(--text);margin-bottom:14px;line-height:1.5;">${q.q}</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">`;
+
+    q.opts.forEach((opt,oi) => {
+      let bg='var(--bg2)',border='var(--border)',color='var(--text)',cursor=isRevealed?'not-allowed':'pointer';
+      if(isRevealed){
+        if(oi===q.correct){bg='#f0fdf4';border='#22c55e';color='#14532d';}
+        else if(oi===chosen&&oi!==q.correct){bg='#fef2f2';border='#ef4444';color='#7f1d1d';}
+      }
+      const onclick = isRevealed ? '' : `onclick="retAnswer(${qi},${oi})"`;
+      html += `<button ${onclick} style="padding:11px 14px;border:2px solid ${border};border-radius:10px;background:${bg};color:${color};font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:.9rem;cursor:${cursor};text-align:left;display:flex;align-items:center;gap:10px;transition:all .15s;">
+        <span style="width:24px;height:24px;border-radius:50%;background:${isRevealed&&oi===q.correct?'#22c55e':isRevealed&&oi===chosen?'#ef4444':'var(--border)'};color:${isRevealed&&(oi===q.correct||oi===chosen)?'#fff':'var(--muted)'};font-weight:800;font-size:.78rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${['A','B','C','D'][oi]}</span>${opt}</button>`;
+    });
+
+    html += `</div>`;
+    if(isRevealed){
+      const correct = chosen === q.correct;
+      html += `<div style="margin-top:10px;padding:10px 14px;border-radius:10px;font-size:.84rem;line-height:1.6;background:${correct?'#f0fdf4':'#fef2f2'};border:1.5px dashed ${correct?'#22c55e':'#ef4444'};color:${correct?'#14532d':'#7f1d1d'};">
+        ${correct?'✅ Correct! ':'❌ Not quite. The correct answer is '+['A','B','C','D'][q.correct]+'. '}${q.explain}</div>`;
+    }
+    html += `</div>`;
+  });
+
+  const allDone = Object.keys(retQuizRevealed).length === retQuizData.length;
+  if(allDone){
+    html += `<div style="text-align:center;margin-top:4px;">
+      <button onclick="renderRetentionScore()" style="background:var(--accent);color:#fff;border:none;border-radius:50px;padding:11px 28px;font-family:'Architects Daughter',cursive;font-size:1.05rem;cursor:pointer;box-shadow:0 3px 0 var(--accent2);">See My Score 🎉</button>
+    </div>`;
+  }
+
+  section.innerHTML = html;
+}
+
+function retAnswer(qi, oi) {
+  retQuizAnswers[qi] = oi;
+  retQuizRevealed[qi] = true;
+  renderRetentionQuiz();
+}
+
+function renderRetentionScore() {
+  const correct = Object.entries(retQuizAnswers).filter(([qi,ai])=>retQuizData[parseInt(qi)]?.correct===ai).length;
+  const total = retQuizData.length;
+  const pct = Math.round((correct/total)*100);
+  const emoji = pct>=80?'🎉':pct>=60?'💪':'📚';
+  const msg = pct>=80?'Great retention!':pct>=60?'Getting there!':'Keep reviewing!';
+
+  let reviewHtml = '';
+  retQuizData.forEach((q,qi)=>{
+    const ok = retQuizAnswers[qi]===q.correct;
+    reviewHtml += `<div style="padding:8px 12px;border-radius:10px;margin-bottom:6px;font-size:.82rem;border:1.5px solid ${ok?'#22c55e':'#ef4444'};background:${ok?'#f0fdf4':'#fef2f2'};color:${ok?'#14532d':'#7f1d1d'};">
+      ${ok?'✅':'❌'} <strong>Q${qi+1}:</strong> ${q.q.substring(0,60)}...</div>`;
+  });
+
+  document.getElementById('retention-quiz-section').innerHTML = `
+  <div style="background:var(--card);border:2px solid var(--border);border-radius:18px;padding:28px;text-align:center;box-shadow:4px 4px 0 var(--border);">
+    <div style="font-size:2.5rem;margin-bottom:8px;">${emoji}</div>
+    <div style="font-family:'Architects Daughter',cursive;font-size:1.6rem;color:var(--accent);margin-bottom:6px;">${msg}</div>
+    <div style="font-size:2.8rem;font-weight:800;color:var(--text);margin:10px 0 4px;">${correct}/${total}</div>
+    <div style="color:var(--muted);font-size:.92rem;margin-bottom:20px;">${pct}% retained</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;">
+      <div style="background:var(--bg2);border:2px solid var(--border);border-radius:12px;padding:12px 8px;">
+        <div style="font-size:1.4rem;font-weight:800;color:#22c55e;">${correct}</div>
+        <div style="font-size:.7rem;color:var(--muted);font-weight:600;margin-top:2px;">Correct ✅</div>
+      </div>
+      <div style="background:var(--bg2);border:2px solid var(--border);border-radius:12px;padding:12px 8px;">
+        <div style="font-size:1.4rem;font-weight:800;color:#ef4444;">${total-correct}</div>
+        <div style="font-size:.7rem;color:var(--muted);font-weight:600;margin-top:2px;">Review ❌</div>
+      </div>
+      <div style="background:var(--bg2);border:2px solid var(--border);border-radius:12px;padding:12px 8px;">
+        <div style="font-size:1.4rem;font-weight:800;color:var(--text);">${total}</div>
+        <div style="font-size:.7rem;color:var(--muted);font-weight:600;margin-top:2px;">Total</div>
+      </div>
+    </div>
+    <div style="text-align:left;margin-bottom:18px;">
+      <div style="font-family:'Architects Daughter',cursive;font-size:.95rem;color:var(--text);margin-bottom:8px;">📋 Question Review</div>
+      ${reviewHtml}
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button onclick="retakeRetentionQuiz()" style="background:var(--accent);color:#fff;border:none;border-radius:50px;padding:10px 24px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;box-shadow:0 3px 0 var(--accent2);">🔄 Retake Quiz</button>
+    </div>
+  </div>`;
+}
+
+function retakeRetentionQuiz() {
+  retQuizAnswers = {};
+  retQuizRevealed = {};
+  renderRetentionBanner();
+}
+// ────────────────────────────────────────────────────────────────
+
 function resetApp(){
   hide('output-section');document.getElementById('upload-section').style.cssText='';
   document.getElementById('paste-input').value='';hide('gen-err');document.getElementById('notes-render').innerHTML='';
   hide('save-btn');currentHTML='';clearFile();window.scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('retention-quiz-section').style.display='none';
+  retQuizAnswers={};retQuizRevealed={};retQuizData=[];
 }
 
 function downloadNotes(){
