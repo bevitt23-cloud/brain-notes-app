@@ -625,6 +625,29 @@ async function extractText(){
 
 function readB64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(new Error('Could not read file'));r.readAsDataURL(file);});}
 
+async function callAI(payload){
+  // Try Gemini first, fall back to Claude if it fails
+  try{
+    return await callGemini(payload);
+  }catch(geminiErr){
+    console.warn('Gemini failed, falling back to Claude:', geminiErr.message);
+    return await callAI(payload);
+  }
+}
+
+async function callGemini(payload){
+  let resp;
+  try{resp=await fetch('/api/gemini',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});}
+  catch(e){throw new Error('Could not connect to Gemini.');}
+  const rawText=await resp.text();let data;
+  try{data=JSON.parse(rawText);}catch(e){if(resp.status===504)throw new Error('Gemini took too long.');throw new Error('Gemini error.');}
+  if(!resp.ok){
+    if(resp.status===429)throw new Error('Gemini rate limit hit.');
+    throw new Error(data?.error||'Gemini failed.');
+  }
+  return data.content.filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+}
+
 async function callClaude(payload){
   let resp;
   try{resp=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});}
@@ -680,7 +703,7 @@ async function generateNotes(){
     }
     updateLoadingStatus('Building your notes...','Claude is reading your content and making it brain-friendly 🧠');
     const activePrompt=currentMode==='dyslexic'?DYSLEXIA_PROMPT:SYSTEM_PROMPT;
-    let html=await callClaude({model:'claude-sonnet-4-20250514',max_tokens:6000,system:activePrompt,messages});
+    let html=await callAI({model:'claude-sonnet-4-20250514',max_tokens:6000,system:activePrompt,messages});
     const fence=html.match(/```(?:html)?\s*([\s\S]*?)```/i);if(fence)html=fence[1].trim();
     if(!html.includes('<'))html=`<h1>📋 Your Notes</h1><div class="n-section"><div class="n-chunk"><p>${html.replace(/\n/g,'<br>')}</p></div></div>`;
     // If docx had images, inject them into the rendered output so they display
@@ -829,7 +852,7 @@ async function openExplainPanel(){
   document.getElementById('explain-body').innerHTML='<div class="explain-spin-wrap"><div class="explain-spinner"></div> Explaining this for you...</div>';
   show('explain-panel');window.scrollBy({top:120,behavior:'smooth'});
   try{
-    const result=await callClaude({model:'claude-sonnet-4-20250514',max_tokens:600,
+    const result=await callAI({model:'claude-sonnet-4-20250514',max_tokens:600,
       system:`You are a patient tutor helping someone with ADHD. Explain in plain English, 3-5 sentences max. Use a real-life analogy if helpful. Return only simple HTML with <strong> for key words and ONE colored box: <div class="e-box yellow">✏️ <strong>Remember:</strong> ...</div> OR <div class="e-box blue">📘 <strong>In plain English:</strong> ...</div> OR <div class="e-box green">📗 <strong>Real life example:</strong> ...</div>. No markdown.`,
       messages:[{role:'user',content:`Explain this from my study notes: "${selectedText}"`}]});
     document.getElementById('explain-body').innerHTML=result;
