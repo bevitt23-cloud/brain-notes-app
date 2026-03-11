@@ -601,6 +601,19 @@ async function extractText(){
   const urlVal=document.getElementById('url-input')?document.getElementById('url-input').value.trim():'';
   if(urlVal&&urlVal.startsWith('http')){
     let resp,data;
+    // ── YouTube fast path: grab transcript directly instead of scraping ──
+    const ytMatch=urlVal.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if(ytMatch){
+      updateLoadingStatus('Found a YouTube video! Grabbing the transcript... 🎬','This usually takes 2-5 seconds');
+      let ytResp;
+      try{ytResp=await fetch('/api/youtube-transcript',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:urlVal})});}
+      catch(e){throw new Error('Could not connect to the transcript fetcher. Check your internet and try again.');}
+      const ytData=await ytResp.json();
+      if(!ytResp.ok||ytData.error)throw new Error(ytData.error||'Could not get the transcript for that video.');
+      const titleLine=ytData.title?`Video: "${ytData.title}"\n\n`:'';
+      updateLoadingStatus('Transcript grabbed! Now making it brain-friendly 🧠','');
+      return{type:'text',content:titleLine+ytData.transcript};
+    }
     // If URL points directly to a PDF, fetch it as binary and send as PDF document
     if(urlVal.toLowerCase().includes('.pdf')){
       let pdfResp;
@@ -631,7 +644,7 @@ async function callAI(payload){
     return await callGemini(payload);
   }catch(geminiErr){
     console.warn('Gemini failed, falling back to Claude:', geminiErr.message);
-    return await callAI(payload);
+    return await callClaude(payload);
   }
 }
 
