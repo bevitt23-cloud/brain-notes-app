@@ -1,4 +1,4 @@
-import { YoutubeTranscript } from 'youtube-transcript';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -7,62 +7,74 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
+  const apiKey = process.env.GEMINI_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'Gemini API key not configured' });
+
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     const { url } = body;
 
     if (!url) return res.status(400).json({ error: 'No URL provided' });
 
-    // Extract video ID from any YouTube URL format
     const videoId = extractYouTubeId(url);
     if (!videoId) return res.status(400).json({ error: 'Could not find a YouTube video ID in that URL.' });
 
-    // Fetch transcript using the youtube-transcript package
-    // It handles YouTube's bot detection automatically
-    let transcriptData;
+    // Gemini natively supports YouTube URLs — no transcript fetching needed
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 55000);
+
     try {
-      transcriptData = await YoutubeTranscript.fetchTranscript(videoId, { lang: 'en' });
-    } catch (e) {
-      // If English not found, try without language preference (takes whatever's available)
+      const result = await model.generateContent({
+        contents: [{
+          role: "user",
+          parts: [
+            {
+              // Pass the YouTube URL directly — Gemini reads the video natively
+              fileData: {
+                mimeType: "video/youtube",
+                fileUri: `https://www.youtube.com/watch?v=${videoId}`
+              }
+            },
+            {
+              text: "Please transcribe the full spoken content of this video as plain text. Include all spoken words in order. Do not add any commentary, summaries, or formatting — just the raw transcript text."
+            }
+          ]
+        }],
+        generationConfig: {
+          maxOutputTokens: 8000,
+          temperature: 0.1,
+        }
+      });
+
+      clearTimeout(timeout);
+
+      const transcript = result.response.text();
+
+      // Also try to get the video title via oEmbed (free, no API key)
+      let videoTitle = 'YouTube Video';
       try {
-        transcriptData = await YoutubeTranscript.fetchTranscript(videoId);
-      } catch (e2) {
-        return res.status(422).json({
-          error: 'No transcript available for this video. The creator may have captions turned off, or this video may be too new.'
-        });
+        const oembedRes = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
+        if (oembedRes.ok) {
+          const oembedData = await oembedRes.json();
+          if (oembedData.title) videoTitle = oembedData.title;
+        }
+      } catch (e) { /* title is optional */ }
+
+      return res.status(200).json({ transcript, title: videoTitle, videoId });
+
+    } catch (err) {
+      clearTimeout(timeout);
+      if (err.name === 'AbortError') {
+        return res.status(504).json({ error: 'The video took too long to process. Try a shorter video or paste the transcript manually.' });
       }
+      throw err;
     }
-
-    if (!transcriptData || transcriptData.length === 0) {
-      return res.status(422).json({ error: 'Transcript was empty for this video.' });
-    }
-
-    // Join all transcript chunks into plain text
-    const transcript = transcriptData
-      .map(item => item.text.replace(/\n/g, ' ').trim())
-      .filter(Boolean)
-      .join(' ');
-
-    // Try to get video title from YouTube oEmbed (no API key needed)
-    let videoTitle = 'YouTube Video';
-    try {
-      const oembedRes = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
-      if (oembedRes.ok) {
-        const oembedData = await oembedRes.json();
-        if (oembedData.title) videoTitle = oembedData.title;
-      }
-    } catch (e) {
-      // Title is optional, don't fail if we can't get it
-    }
-
-    return res.status(200).json({
-      transcript,
-      title: videoTitle,
-      videoId,
-    });
 
   } catch (err) {
-    return res.status(500).json({ error: err.message || 'Something went wrong fetching the transcript.' });
+    return res.status(500).json({ error: err.message || 'Something went wrong processing the video.' });
   }
 }
 
