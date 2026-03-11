@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash-lite",
+      model: "gemini-1.5-flash-latest",
       // Pass through the system prompt from the app (ADHD mode, dyslexia mode, etc.)
       systemInstruction: body.system || "You are an ADHD-friendly note reformatter. Use bold headers, bullet points, and high-contrast structure. Return only valid HTML."
     });
@@ -71,7 +71,7 @@ export default async function handler(req, res) {
       // Return in Claude-compatible format so the frontend needs no changes
       const formattedResponse = {
         content: [{ type: 'text', text: responseText }],
-        model: "gemini-2.0-flash-lite"
+        model: "gemini-1.5-flash-latest"
       };
 
       clearTimeout(timeout);
