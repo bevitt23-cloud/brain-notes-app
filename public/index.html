@@ -318,7 +318,7 @@ textarea::placeholder{color:var(--muted);}
     <button class="mode-btn active" id="mode-adhd" onclick="setMode('adhd')">🧠 ADHD</button>
     <button class="mode-btn" id="mode-dyslexic" onclick="setMode('dyslexic')">📖 Dyslexia</button>
   </div>
-  <div class="topbar-actions">
+  <div class="topbar-actions" id="topbar-actions">
     <span class="user-email hidden" id="user-email-lbl"></span>
     <button class="topbar-btn hidden" id="btn-my-notes" onclick="openNotesPanel()">📁 My Notes</button>
     <button class="topbar-btn hidden" id="btn-signout" onclick="doSignOut()">Sign Out</button>
@@ -354,7 +354,7 @@ textarea::placeholder{color:var(--muted);}
       <input type="file" id="file-input" accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.gif,.pptx,.ppt,.mp4,.mov,.webm,.avi" />
       <div class="drop-icon">📄</div>
       <div class="drop-text">Drop a file here, or click to browse</div>
-      <div class="drop-sub">Supports: PDF, Word, PowerPoint, .txt, images, or video files (MP4, MOV, WEBM)</div>
+      <div class="drop-sub">Supports: PDF, Word, PowerPoint (.pptx), .txt, images, or video files (MP4, MOV)</div>
       <div class="drop-tip">💡 Tip: If your PDF is very long, paste one section of text instead</div>
     </div>
     <div class="file-preview hidden" id="file-preview">
@@ -446,6 +446,9 @@ textarea::placeholder{color:var(--muted);}
 </div>
 
 <script>
+// ── AUTH FLAG — set to true to re-enable sign in ──
+const AUTH_ENABLED = false;
+
 const SB_URL = 'https://epagtlrtzwdvferumowx.supabase.co';
 const SB_KEY = 'sb_publishable_JLHb8iewqq_RbrmZc5dmHg_KmNRSRra';
 const db = window.supabase.createClient(SB_URL, SB_KEY);
@@ -453,12 +456,13 @@ let currentUser=null,currentHTML='',selectedFile=null,selectedText='',newFolderO
 
 (async function initAuth(){
   const{data:{session}}=await db.auth.getSession();
-  if(session?.user){onSignedIn(session.user);}else{show('auth-overlay');show('btn-signin-top');}
+  if(!AUTH_ENABLED){hide('auth-overlay');hide('btn-signin-top');hide('btn-signout');hide('user-email-lbl');return;}
+  if(session?.user){onSignedIn(session.user);}else{show('btn-signin-top');} // auth overlay disabled for review
   db.auth.onAuthStateChange((_e,session)=>{if(session?.user)onSignedIn(session.user);});
 })();
 
 function onSignedIn(user){currentUser=user;hide('auth-overlay');hide('btn-signin-top');setText('user-email-lbl',user.email);show('user-email-lbl');show('btn-my-notes');show('btn-signout');if(currentHTML)show('save-btn');}
-function onSignedOut(){currentUser=null;hide('user-email-lbl');hide('btn-my-notes');hide('btn-signout');hide('save-btn');show('btn-signin-top');}
+function onSignedOut(){currentUser=null;hide('user-email-lbl');hide('btn-my-notes');hide('btn-signout');hide('save-btn');if(AUTH_ENABLED)show('btn-signin-top');}
 
 let activeTab='in';
 function setView(v){if(v==='login'){show('view-login');hide('view-forgot');}else{hide('view-login');show('view-forgot');}clearMsgs();}
@@ -492,6 +496,8 @@ async function doForgot(){
 async function doSignOut(){await db.auth.signOut();onSignedOut();}
 
 async function openSaveModal(){
+  if(!AUTH_ENABLED){showAuthModal();return;}
+  if(!currentUser){showAuthModal();return;}
   if(!currentUser){showAuthModal();return;}
   document.getElementById('save-title').value='';document.getElementById('new-folder-name').value='';
   hide('save-err');hide('new-folder-wrap');newFolderOpen=false;setText('new-folder-toggle','+ Create new folder');
@@ -597,7 +603,7 @@ async function extractText(){
     }
     if(['jpg','jpeg','png','webp','gif'].includes(ext)){const b64=await readB64(selectedFile);const mimeMap={jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp',gif:'image/gif'};return{type:'image',content:b64.split(',')[1],mime:mimeMap[ext]||'image/jpeg'};}
     if(['mp4','mov','webm','avi'].includes(ext)){
-      if(selectedFile.size>500*1024*1024)throw new Error('Video too large (max 500MB). Try trimming it or use a YouTube URL instead.');
+      if(selectedFile.size>500*1024*1024)throw new Error('Video too large (max 500MB). Try a YouTube URL instead.');
       updateLoadingStatus('Uploading your video...','Transcribing audio -- this takes 30-60 seconds for longer videos');
       const formData=new FormData();formData.append('file',selectedFile);
       let resp;
@@ -605,7 +611,7 @@ async function extractText(){
       catch(e){throw new Error('Could not process that video. Check your connection and try again.');}
       const data=await resp.json();
       if(!resp.ok||data.error)throw new Error(data.error||'Could not transcribe that video.');
-      if(!data.transcript||data.transcript.trim().length<10)throw new Error('No speech detected in that video. Make sure it has audio.');
+      if(!data.transcript||data.transcript.trim().length<10)throw new Error('No speech detected. Make sure the video has audio.');
       updateLoadingStatus('Transcript ready! Now making it brain-friendly','');
       return{type:'text',content:data.transcript};
     }
@@ -614,7 +620,7 @@ async function extractText(){
       const formData=new FormData();formData.append('file',selectedFile);
       let resp;
       try{resp=await fetch('/api/extract-pptx',{method:'POST',body:formData});}
-      catch(e){throw new Error('Could not process that PowerPoint file. Try saving as PDF first.');}
+      catch(e){throw new Error('Could not process that PowerPoint. Try saving as PDF first.');}
       const data=await resp.json();
       if(!resp.ok||data.error)throw new Error(data.error||'Could not read that PowerPoint file.');
       return{type:'pptx',slides:data.slides,slideCount:data.slideCount};
@@ -661,27 +667,49 @@ async function extractText(){
 
 function readB64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(new Error('Could not read file'));r.readAsDataURL(file);});}
 
-async function callAI(payload){
-  // Try Gemini first, fall back to Claude if it fails
-  try{
-    return await callGemini(payload);
-  }catch(geminiErr){
-    console.warn('Gemini failed, falling back to Claude:', geminiErr.message);
-    return await callClaude(payload);
-  }
+async function callAI(payload, onChunk){
+  try{return await callGeminiStream(payload,onChunk);}
+  catch(e){console.warn('Gemini failed, falling back to Claude:',e.message);return await callClaudeStream(payload,onChunk);}
 }
 
-async function callGemini(payload){
-  let resp;
-  try{resp=await fetch('/api/gemini',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});}
-  catch(e){throw new Error('Could not connect to Gemini.');}
-  const rawText=await resp.text();let data;
-  try{data=JSON.parse(rawText);}catch(e){if(resp.status===504)throw new Error('Gemini took too long.');throw new Error('Gemini error.');}
-  if(!resp.ok){
-    if(resp.status===429)throw new Error('Gemini rate limit hit.');
-    throw new Error(data?.error||'Gemini failed.');
+async function readSSEStream(resp,onChunk){
+  if(!resp.ok){const d=await resp.json().catch(()=>({}));throw new Error(d?.error||'Server error '+resp.status);}
+  const reader=resp.body.getReader();
+  const decoder=new TextDecoder();
+  let buffer='';let full='';
+  while(true){
+    const{done,value}=await reader.read();
+    if(done)break;
+    buffer+=decoder.decode(value,{stream:true});
+    const lines=buffer.split('\n');
+    buffer=lines.pop();
+    for(const line of lines){
+      if(!line.startsWith('data: '))continue;
+      const data=line.slice(6).trim();
+      if(data==='[DONE]')continue;
+      try{
+        const ev=JSON.parse(data);
+        if(ev.error)throw new Error(ev.error);
+        if(ev.text){full+=ev.text;if(onChunk)onChunk(full);}
+      }catch(e){if(e.message&&!e.message.startsWith('JSON'))throw e;}
+    }
   }
-  return data.content.filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+  if(!full)throw new Error('No response received. Please try again.');
+  return full.trim();
+}
+
+async function callGeminiStream(payload,onChunk){
+  let resp;
+  try{resp=await fetch('/api/gemini',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,stream:true})});}
+  catch(e){throw new Error('Gemini unreachable.');}
+  return await readSSEStream(resp,onChunk);
+}
+
+async function callClaudeStream(payload,onChunk){
+  let resp;
+  try{resp=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,stream:true})});}
+  catch(e){throw new Error('Could not connect. Check your internet and try again.');}
+  return await readSSEStream(resp,onChunk);
 }
 
 async function callClaude(payload){
@@ -726,13 +754,10 @@ async function generateNotes(){
       for(let i=0;i<Math.min(extracted.images.length,3);i++){const img=extracted.images[i];contentParts.push({type:'text',text:'Image '+(i+1)+' (alt: '+img.alt+', url: '+img.src+'):'});}
       messages=[{role:'user',content:contentParts}];
     }else if(extracted.type==='pptx'){
-      const parts=[{type:'text',text:basePrompt+'\n\nThis is a PowerPoint presentation with '+extracted.slideCount+' slides. Convert into ADHD-friendly notes keeping slides in order:\n'}];
+      const parts=[{type:'text',text:basePrompt+'\n\nThis is a PowerPoint with '+extracted.slideCount+' slides. Convert into ADHD-friendly notes in order:\n'}];
       for(const slide of extracted.slides){
         parts.push({type:'text',text:'\n--- Slide '+slide.slideNumber+' ---\n'+(slide.text||'(no text)')});
-        for(let i=0;i<Math.min(slide.images.length,2);i++){
-          const img=slide.images[i];
-          parts.push({type:'image',source:{type:'base64',media_type:img.mime,data:img.data}});
-        }
+        for(let i=0;i<Math.min(slide.images.length,2);i++){const img=slide.images[i];parts.push({type:'image',source:{type:'base64',media_type:img.mime,data:img.data}});}
       }
       messages=[{role:'user',content:parts}];
     }else if(extracted.type==='docx'&&extracted.images&&extracted.images.length>0){
@@ -747,9 +772,19 @@ async function generateNotes(){
     }else{
       messages=[{role:'user',content:basePrompt+'\n\n'+(extracted.content||extracted)}];
     }
-    updateLoadingStatus('Building your notes...','Claude is reading your content and making it brain-friendly 🧠');
+    updateLoadingStatus('Building your notes...','Words will start appearing below as they generate 🧠');
+    // Show the output section early so streaming is visible
+    show('output-section');
+    document.getElementById('notes-render').innerHTML='<div style="padding:20px;color:var(--muted);font-style:italic;">✍️ Writing your notes...</div>';
+    document.getElementById('output-section').scrollIntoView({behavior:'smooth',block:'start'});
     const activePrompt=currentMode==='dyslexic'?DYSLEXIA_PROMPT:SYSTEM_PROMPT;
-    let html=await callAI({model:'claude-sonnet-4-20250514',max_tokens:6000,system:activePrompt,messages});
+    let html=await callAI({model:'claude-sonnet-4-20250514',max_tokens:6000,system:activePrompt,messages},function(partial){
+      // Live render as chunks arrive
+      let live=partial;
+      const fence=live.match(/```(?:html)?\s*([\s\S]*?)```/i);if(fence)live=fence[1].trim();
+      if(!live.includes('<'))live='<div class="n-chunk"><p>'+live.replace(/\n/g,'<br>')+'</p></div>';
+      document.getElementById('notes-render').innerHTML=live;
+    });
     const fence=html.match(/```(?:html)?\s*([\s\S]*?)```/i);if(fence)html=fence[1].trim();
     if(!html.includes('<'))html=`<h1>📋 Your Notes</h1><div class="n-section"><div class="n-chunk"><p>${html.replace(/\n/g,'<br>')}</p></div></div>`;
     // If docx had images, inject them into the rendered output so they display
@@ -762,13 +797,11 @@ async function generateNotes(){
       html=html+imgBlock;
     }
     if(extracted&&extracted.type==='pptx'){
-      let imgBlock='<div class="n-section"><div class="n-section-title">Slide Images</div>';
+      let imgBlock='<div class="n-section"><div class="n-section-title">🖼️ Slide Images</div>';
       extracted.slides.forEach(function(slide){
         if(slide.images&&slide.images.length>0){
           imgBlock+='<div style="margin-bottom:18px;"><div style="font-weight:700;margin-bottom:6px;color:var(--muted);">Slide '+slide.slideNumber+'</div>';
-          slide.images.forEach(function(img,i){
-            imgBlock+='<img src="data:'+img.mime+';base64,'+img.data+'" style="max-width:100%;border-radius:10px;border:2px solid var(--border);display:block;margin-bottom:8px;" alt="Slide '+slide.slideNumber+' image '+(i+1)+'" />';
-          });
+          slide.images.forEach(function(img,i){imgBlock+='<img src="data:'+img.mime+';base64,'+img.data+'" style="max-width:100%;border-radius:10px;border:2px solid var(--border);display:block;margin-bottom:8px;" alt="Slide '+slide.slideNumber+' image '+(i+1)+'" />';});
           imgBlock+='</div>';
         }
       });
@@ -776,8 +809,7 @@ async function generateNotes(){
       html=html+imgBlock;
     }
     currentHTML=html;document.getElementById('notes-render').innerHTML=html;
-    restoreStickyNotes([]);show('output-section');if(currentUser)show('save-btn');
-    document.getElementById('output-section').scrollIntoView({behavior:'smooth',block:'start'});
+    restoreStickyNotes([]);show('save-btn');
   }catch(e){
     showErr('gen-err',e.message);
     document.getElementById('upload-section').style.opacity='1';document.getElementById('upload-section').style.pointerEvents='auto';
