@@ -351,10 +351,10 @@ textarea::placeholder{color:var(--muted);}
   <div class="upload-section" id="upload-section">
     <div class="section-label">📂 Step 1 -- Add Your Content</div>
     <div class="drop-zone" id="drop-zone">
-      <input type="file" id="file-input" accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.gif" />
+      <input type="file" id="file-input" accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.gif,.pptx,.ppt,.mp4,.mov,.webm,.avi" />
       <div class="drop-icon">📄</div>
       <div class="drop-text">Drop a file here, or click to browse</div>
-      <div class="drop-sub">Supports: PDF, Word (.docx), .txt, or image files (JPG, PNG)</div>
+      <div class="drop-sub">Supports: PDF, Word, PowerPoint, .txt, images, or video files (MP4, MOV, WEBM)</div>
       <div class="drop-tip">💡 Tip: If your PDF is very long, paste one section of text instead</div>
     </div>
     <div class="file-preview hidden" id="file-preview">
@@ -596,7 +596,30 @@ async function extractText(){
       const b64=await readB64(selectedFile);return{type:'pdf',content:b64};
     }
     if(['jpg','jpeg','png','webp','gif'].includes(ext)){const b64=await readB64(selectedFile);const mimeMap={jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp',gif:'image/gif'};return{type:'image',content:b64.split(',')[1],mime:mimeMap[ext]||'image/jpeg'};}
-    throw new Error('Unsupported file type. Please use PDF, .docx, .txt, or an image file.');
+    if(['mp4','mov','webm','avi'].includes(ext)){
+      if(selectedFile.size>500*1024*1024)throw new Error('Video too large (max 500MB). Try trimming it or use a YouTube URL instead.');
+      updateLoadingStatus('Uploading your video...','Transcribing audio -- this takes 30-60 seconds for longer videos');
+      const formData=new FormData();formData.append('file',selectedFile);
+      let resp;
+      try{resp=await fetch('/api/extract-video',{method:'POST',body:formData});}
+      catch(e){throw new Error('Could not process that video. Check your connection and try again.');}
+      const data=await resp.json();
+      if(!resp.ok||data.error)throw new Error(data.error||'Could not transcribe that video.');
+      if(!data.transcript||data.transcript.trim().length<10)throw new Error('No speech detected in that video. Make sure it has audio.');
+      updateLoadingStatus('Transcript ready! Now making it brain-friendly','');
+      return{type:'text',content:data.transcript};
+    }
+    if(['pptx','ppt'].includes(ext)){
+      updateLoadingStatus('Reading your PowerPoint...','Extracting slides and images');
+      const formData=new FormData();formData.append('file',selectedFile);
+      let resp;
+      try{resp=await fetch('/api/extract-pptx',{method:'POST',body:formData});}
+      catch(e){throw new Error('Could not process that PowerPoint file. Try saving as PDF first.');}
+      const data=await resp.json();
+      if(!resp.ok||data.error)throw new Error(data.error||'Could not read that PowerPoint file.');
+      return{type:'pptx',slides:data.slides,slideCount:data.slideCount};
+    }
+    throw new Error('Unsupported file type. Please use PDF, Word, PowerPoint, .txt, image, or video file.');
   }
   const urlVal=document.getElementById('url-input')?document.getElementById('url-input').value.trim():'';
   if(urlVal&&urlVal.startsWith('http')){
@@ -702,6 +725,16 @@ async function generateNotes(){
       const contentParts=[{type:'text',text:basePrompt+'\n\nPage text:\n'+extracted.content+'\n\nThis page also contains images. After your notes, include a section called "Visual References" that links back to each image and describes what it shows based on context. Use this format for each image: <div class="n-box blue"><div class="n-box-label">🖼 Visual Reference</div><p>[Description of what this image/diagram shows]</p><a href="IMAGE_URL" target="_blank" rel="noopener">View original image</a></div>'}];
       for(let i=0;i<Math.min(extracted.images.length,3);i++){const img=extracted.images[i];contentParts.push({type:'text',text:'Image '+(i+1)+' (alt: '+img.alt+', url: '+img.src+'):'});}
       messages=[{role:'user',content:contentParts}];
+    }else if(extracted.type==='pptx'){
+      const parts=[{type:'text',text:basePrompt+'\n\nThis is a PowerPoint presentation with '+extracted.slideCount+' slides. Convert into ADHD-friendly notes keeping slides in order:\n'}];
+      for(const slide of extracted.slides){
+        parts.push({type:'text',text:'\n--- Slide '+slide.slideNumber+' ---\n'+(slide.text||'(no text)')});
+        for(let i=0;i<Math.min(slide.images.length,2);i++){
+          const img=slide.images[i];
+          parts.push({type:'image',source:{type:'base64',media_type:img.mime,data:img.data}});
+        }
+      }
+      messages=[{role:'user',content:parts}];
     }else if(extracted.type==='docx'&&extracted.images&&extracted.images.length>0){
       // Send text + embedded images to Claude so it can see and reference them
       const parts=[{type:'text',text:basePrompt+'\n\nDocument text (HTML):\n'+extracted.content.replace(/<[^>]+>/g,' ')}];
@@ -724,6 +757,20 @@ async function generateNotes(){
       let imgBlock='<div class="n-section"><div class="n-section-title">🖼️ Images from Your Document</div>';
       extracted.images.forEach(function(img,i){
         imgBlock+='<div style="margin-bottom:14px;"><img src="'+img.src+'" style="max-width:100%;border-radius:10px;border:2px solid var(--border);display:block;" alt="Document image '+(i+1)+'" /></div>';
+      });
+      imgBlock+='</div>';
+      html=html+imgBlock;
+    }
+    if(extracted&&extracted.type==='pptx'){
+      let imgBlock='<div class="n-section"><div class="n-section-title">Slide Images</div>';
+      extracted.slides.forEach(function(slide){
+        if(slide.images&&slide.images.length>0){
+          imgBlock+='<div style="margin-bottom:18px;"><div style="font-weight:700;margin-bottom:6px;color:var(--muted);">Slide '+slide.slideNumber+'</div>';
+          slide.images.forEach(function(img,i){
+            imgBlock+='<img src="data:'+img.mime+';base64,'+img.data+'" style="max-width:100%;border-radius:10px;border:2px solid var(--border);display:block;margin-bottom:8px;" alt="Slide '+slide.slideNumber+' image '+(i+1)+'" />';
+          });
+          imgBlock+='</div>';
+        }
       });
       imgBlock+='</div>';
       html=html+imgBlock;

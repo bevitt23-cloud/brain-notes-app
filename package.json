@@ -4,6 +4,7 @@
   "dependencies": {
     "pdf-parse": "^1.1.1",
     "youtube-transcript": "^1.2.1",
-    "@google/generative-ai": "^0.21.0"
+    "@google/generative-ai": "^0.21.0",
+    "adm-zip": "^0.5.12"
   }
 }
