@@ -2,6 +2,8 @@
   "name": "brain-friendly-notes",
   "version": "1.0.0",
   "dependencies": {
-    "pdf-parse": "^1.1.1"
+    "pdf-parse": "^1.1.1",
+    "youtube-transcript": "^1.2.1",
+    "@google/generative-ai": "^0.21.0"
   }
 }
