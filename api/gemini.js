@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     const body = req.body;
     // Use the correct model name to avoid the 404 error
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash", 
+      model: "gemini-2.5-flash-lite", 
       systemInstruction: body.system
     });
 
